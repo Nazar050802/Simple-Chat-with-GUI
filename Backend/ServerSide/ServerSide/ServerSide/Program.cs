@@ -12,7 +12,9 @@ namespace ServerSide
     {
         static void Main(string[] args)
         {
-            
+            SimpleLogs.CreateLogFile();
+            SimpleLogs.WriteToFile("Test");
+
         }
     }
 }

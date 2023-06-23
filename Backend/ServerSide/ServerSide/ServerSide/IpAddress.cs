@@ -8,21 +8,22 @@ using System.Threading.Tasks;
 
 namespace ServerSide
 {
-    public interface IpAdressProvider
+    public interface IIpAdressProvider
     {
         IPAddress GetIPAddress();
     }
 
-    public class LocalHostIpAdressProvider : IpAdressProvider
+    public class LocalHostIpAdressProvider : IIpAdressProvider
     {
         public IPAddress GetIPAddress()
         {
+            // Get localhost 
             IPHostEntry ipHost = Dns.GetHostEntry("localhost");
             return ipHost.AddressList[0];
         }
     }
 
-    public class ExternalIpAdressProvider : IpAdressProvider
+    public class ExternalIpAdressProvider : IIpAdressProvider
     {
         protected string IpAddress { get; set; }
 
@@ -33,6 +34,7 @@ namespace ServerSide
 
         public IPAddress GetIPAddress() 
         { 
+            // Get global ip
             return IPAddress.Parse(IpAddress);
         }
     }
@@ -40,7 +42,7 @@ namespace ServerSide
     internal class IpAddress
     {
         private bool DebugMode { get; set; }
-        private IpAdressProvider IpAddressString { get; set;}
+        private IIpAdressProvider IpAddressString { get; set;}
 
         private int Port { get; set; }
 
@@ -49,7 +51,8 @@ namespace ServerSide
             DebugMode = debugMode;
             Port = port;
 
-            IpAddressString = debugMode ? (IpAdressProvider) new LocalHostIpAdressProvider() : new ExternalIpAdressProvider(ipAddressString);
+            // Get ip depending on whether debug mode is currently enabled. If yes get localhost. If not get global ip
+            IpAddressString = DebugMode ? (IIpAdressProvider) new LocalHostIpAdressProvider() : new ExternalIpAdressProvider(ipAddressString);
         }
 
         public IPEndPoint GetIPEndPoint()
