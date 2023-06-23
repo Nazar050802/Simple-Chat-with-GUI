@@ -1,0 +1,8 @@
+D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ClientSide\ClientSide\ClientSide\bin\Debug\ClientSide.exe.config
+D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ClientSide\ClientSide\ClientSide\bin\Debug\ClientSide.exe
+D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ClientSide\ClientSide\ClientSide\bin\Debug\ClientSide.pdb
+D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ClientSide\ClientSide\ClientSide\obj\Debug\ClientSide.csproj.AssemblyReference.cache
+D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ClientSide\ClientSide\ClientSide\obj\Debug\ClientSide.csproj.SuggestedBindingRedirects.cache
+D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ClientSide\ClientSide\ClientSide\obj\Debug\ClientSide.csproj.CoreCompileInputs.cache
+D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ClientSide\ClientSide\ClientSide\obj\Debug\ClientSide.exe
+D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ClientSide\ClientSide\ClientSide\obj\Debug\ClientSide.pdb
