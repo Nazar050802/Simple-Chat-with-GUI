@@ -1,0 +1,6 @@
+[25/06/2023 18:03:04] Log file was created
+[25/06/2023 18:03:10] [CommunicationWithClient.cs] [ERROR] System.Net.Sockets.SocketException (0x80004005): An existing connection was forcibly closed by the remote host
+   at System.Net.Sockets.Socket.Receive(Byte[] buffer, Int32 offset, Int32 size, SocketFlags socketFlags)
+   at System.Net.Sockets.Socket.Receive(Byte[] buffer)
+   at ServerSide.InteractWithClient.ReceiveData() in D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ServerSide\ServerSide\ServerSide\CommunicationWithClient.cs:line 149
+   at ServerSide.ClientHandler.Handle() in D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ServerSide\ServerSide\ServerSide\CommunicationWithClient.cs:line 68

@@ -43,7 +43,7 @@ namespace ServerSide
             }
             catch (Exception ex)
             {
-                SimpleLogs.WriteToFile("[CommunicationWithClient.cs][ERROR] " + ex.ToString());
+                SimpleLogs.WriteToFile("[ServerCore.cs][ERROR] " + ex.ToString());
             }
 
             
