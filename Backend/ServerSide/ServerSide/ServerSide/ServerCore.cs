@@ -41,9 +41,9 @@ namespace ServerSide
                     }
                 }
             }
-            catch (Exception exceptionOfCreatingSocketListener)
+            catch (Exception ex)
             {
-                SimpleLogs.WriteToFile(exceptionOfCreatingSocketListener.ToString());
+                SimpleLogs.WriteToFile("[CommunicationWithClient.cs][ERROR] " + ex.ToString());
             }
 
             

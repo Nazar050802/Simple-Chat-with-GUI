@@ -8,6 +8,6 @@ namespace ClientSide
 {
     internal class ClientCore
     {
-
+        public ClientCore() { }
     }
 }

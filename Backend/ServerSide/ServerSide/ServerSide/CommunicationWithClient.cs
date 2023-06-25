@@ -59,28 +59,32 @@ namespace ServerSide
         {
             try
             {
+                // Create a Timeout for Connection with Client
                 handler.ReceiveTimeout = 5000;
 
+                // Get data from Client
                 string requestData = ReceiveData();
                 Console.WriteLine(requestData);
 
+                // Send reply to Client
                 string reply = GenerateReply(requestData);
                 SendData(reply);
             }
             catch (SocketException ex)
             {
+                // Exception for Timeout Error
                 if (ex.SocketErrorCode == SocketError.TimedOut)
                 {
                     HandleTimeout(ex);
                 }
                 else
                 {
-                    HandleException(ex);
+                    HandleException(ex, "[ERROR]");
                 }
             }
             catch (Exception ex)
             {
-                HandleException(ex);
+                HandleException(ex, "[ERROR]");
             }
             finally 
             {
@@ -92,12 +96,13 @@ namespace ServerSide
         {
             byte[] buffer = new byte[1024];
             int bytesRead = handler.Receive(buffer);
+
             return Encoding.UTF8.GetString(buffer, 0, bytesRead);
         }
 
         private string GenerateReply(string requestData)
         {
-            string reply = "Thank you for your request to" + requestData.Length.ToString() + " symbols";
+            string reply = "Thank you for your request to " + requestData.Length.ToString() + " symbols";
             return reply;
         }
 
@@ -115,12 +120,12 @@ namespace ServerSide
 
             Console.WriteLine(timeoutMessage);
 
-            HandleException(ex);
+            HandleException(ex, "[INFO]");
         }
 
-        private void HandleException(Exception ex)
+        private void HandleException(Exception ex, string additionalText = "")
         {
-            SimpleLogs.WriteToFile("[CommunicationWithClient.cs]" + ex.ToString());
+            SimpleLogs.WriteToFile($"[CommunicationWithClient.cs] {additionalText} " + ex.ToString());
         }
 
         private void CloseConnection()
