@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace ServerSide
 {
-    internal class Core
+    internal class ServerCore
     {
-        public Core() { }
+        public ServerCore() { }
 
         public void StartServer()
         {

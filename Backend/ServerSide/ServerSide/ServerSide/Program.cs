@@ -12,7 +12,7 @@ namespace ServerSide
     {
         static void Main(string[] args)
         {
-            Core core = new Core(); 
+            ServerCore core = new ServerCore(); 
             core.StartServer();
         }
     }

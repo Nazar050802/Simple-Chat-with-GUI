@@ -28,7 +28,9 @@ namespace ServerSide
 
                 int workerThreads, completionPortThreads;
                 ThreadPool.GetAvailableThreads(out workerThreads, out completionPortThreads);
-                Console.WriteLine("Активных потоков: " + (workerThreads + 1)); // +1 for the current thread
+
+                // +1 for the current thread
+                Console.WriteLine("Active Threads: " + (workerThreads + 1)); 
             }
             catch (Exception ex)
             {
@@ -95,7 +97,7 @@ namespace ServerSide
 
         private string GenerateReply(string requestData)
         {
-            string reply = "Спасибо за запрос в " + requestData.Length.ToString() + " символов";
+            string reply = "Thank you for your request to" + requestData.Length.ToString() + " symbols";
             return reply;
         }
 
@@ -126,7 +128,7 @@ namespace ServerSide
             handler.Shutdown(SocketShutdown.Both);
             handler.Close();
 
-            Console.WriteLine("Поток завершил работу.");
+            Console.WriteLine("The thread has finished running.");
         }
     }
 }
