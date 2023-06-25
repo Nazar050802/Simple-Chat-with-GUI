@@ -12,9 +12,8 @@ namespace ServerSide
     {
         static void Main(string[] args)
         {
-            SimpleLogs.CreateLogFile();
-            SimpleLogs.WriteToFile("Test");
-
+            Core core = new Core(); 
+            core.StartServer();
         }
     }
 }

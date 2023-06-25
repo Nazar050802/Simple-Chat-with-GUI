@@ -10,7 +10,7 @@ namespace ServerSide
 {
     internal static class SimpleLogs
     {
-        private static string fileName = $"log_{DateTime.Now.ToString("dd_MM_yyyy")}.txt";
+        private static string fileName = $"log_{DateTime.Now.ToString("dd_MM_yyyy_HH_mm_ss")}.txt";
         private static string pathToFile = Path.Combine(Environment.CurrentDirectory, fileName);
 
         public static bool CreateLogFile()

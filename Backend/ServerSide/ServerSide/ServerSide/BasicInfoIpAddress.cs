@@ -39,14 +39,14 @@ namespace ServerSide
         }
     }
 
-    internal class IpAddress
+    internal class BasicInfoIpAddress
     {
         private bool DebugMode { get; set; }
         private IIpAdressProvider IpAddressString { get; set;}
 
         private int Port { get; set; }
 
-        public IpAddress(bool debugMode, string ipAddressString = "127.0.0.1", int port = 11000)
+        public BasicInfoIpAddress(bool debugMode, string ipAddressString = "127.0.0.1", int port = 11000)
         {
             DebugMode = debugMode;
             Port = port;
@@ -58,6 +58,11 @@ namespace ServerSide
         public IPEndPoint GetIPEndPoint()
         {
             return new IPEndPoint(IpAddressString.GetIPAddress(), Port);
+        }
+
+        public IPAddress GetIPAddress()
+        {
+            return IpAddressString.GetIPAddress();
         }
     }
 }
