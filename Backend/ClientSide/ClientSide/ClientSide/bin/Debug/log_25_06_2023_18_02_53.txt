@@ -1,9 +1,0 @@
-[25/06/2023 18:02:53] Log file was created
-[25/06/2023 18:02:55] [CommunicationWithServer.cs][ERROR] System.Net.Sockets.SocketException (0x80004005): No connection could be made because the target machine actively refused it [::1]:11000
-   at System.Net.Sockets.Socket.DoConnect(EndPoint endPointSnapshot, SocketAddress socketAddress)
-   at System.Net.Sockets.Socket.Connect(EndPoint remoteEP)
-   at ClientSide.CommunicationWithServer.EstablishConnectionWithServer() in D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ClientSide\ClientSide\ClientSide\CommunicationWithServer.cs:line 31
-[25/06/2023 18:02:57] [CommunicationWithServer.cs][ERROR] System.Net.Sockets.SocketException (0x80004005): No connection could be made because the target machine actively refused it [::1]:11000
-   at System.Net.Sockets.Socket.DoConnect(EndPoint endPointSnapshot, SocketAddress socketAddress)
-   at System.Net.Sockets.Socket.Connect(EndPoint remoteEP)
-   at ClientSide.CommunicationWithServer.EstablishConnectionWithServer() in D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ClientSide\ClientSide\ClientSide\CommunicationWithServer.cs:line 31

@@ -44,6 +44,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommunicationWithClient.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="RSAEncryption.cs" />
     <Compile Include="ServerCore.cs" />
     <Compile Include="BasicInfoIpAddress.cs" />
     <Compile Include="SocketListener.cs" />

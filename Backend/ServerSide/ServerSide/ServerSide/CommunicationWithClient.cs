@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -62,15 +63,20 @@ namespace ServerSide
                 InteractWithClient interactWithClient = new InteractWithClient(Handler);
 
                 // Create a Timeout for Connection with Client
-                Handler.ReceiveTimeout = 150000;
+                Handler.ReceiveTimeout = Constants.TimeOutToDisconnectClient;
+
+                RSAGenerating rsaGenerating = new RSAGenerating();
+                interactWithClient.SendString(rsaGenerating.PublicKey);
+
 
                 // Get data from Client
-                string requestData = interactWithClient.ReceiveData();
-                Console.WriteLine(requestData);
+                byte[] requestData = interactWithClient.ReceiveRawData();
 
-                // Send reply to Client
-                string reply = interactWithClient.GenerateReply(requestData);
-                interactWithClient.SendData(reply);
+                Console.WriteLine(rsaGenerating.DecryptIntoString(requestData));
+
+                //// Send reply to Client
+                //string reply = interactWithClient.GenerateReply(requestData);
+                //interactWithClient.SendData(reply);
             }
             catch (SocketException ex)
             {
@@ -143,23 +149,30 @@ namespace ServerSide
             Handler = handler;
         }
 
-        public string ReceiveData()
+        public string ReceiveString()
         {
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[Constants.BufferSize];
             int bytesRead = Handler.Receive(buffer);
 
             return Encoding.UTF8.GetString(buffer, 0, bytesRead);
         }
 
-        public string GenerateReply(string requestData)
+        public byte[] ReceiveRawData()
         {
-            string reply = "Thank you for your request to " + requestData.Length.ToString() + " symbols";
-            return reply;
+            byte[] buffer = new byte[Constants.BufferSize];
+            Handler.Receive(buffer);
+
+            return buffer;
         }
 
-        public void SendData(string data)
+        public void SendString(string data)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(data);
+            Handler.Send(bytes);
+        }
+
+        public void SendRawData(byte[] bytes)
+        {
             Handler.Send(bytes);
         }
     }

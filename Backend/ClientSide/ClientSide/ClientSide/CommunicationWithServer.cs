@@ -1,9 +1,12 @@
-﻿using System;
+﻿using ServerSide;
+using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,12 +40,12 @@ namespace ClientSide
             }
         }
 
-        public bool SendMessage(string message="")
+        public bool SendStringMessage(string message="")
         {
             try
             {
                 InteractWithServer interactionWithServer = new InteractWithServer(Sender);
-                interactionWithServer.SendData(message);
+                interactionWithServer.SendString(message);
             }
             catch (Exception ex)
             {
@@ -53,17 +56,47 @@ namespace ClientSide
             return true;
         }
 
-        public string ReceiveMessage()
+        public bool SendRawData(byte[] bytes)
         {
             try
             {
                 InteractWithServer interactionWithServer = new InteractWithServer(Sender);
-                return interactionWithServer.ReceiveData();
+                interactionWithServer.SendRawData(bytes);
+            }
+            catch (Exception ex)
+            {
+                SimpleLogs.WriteToFile("[CommunicationWithServer.cs][ERROR] " + ex.ToString());
+                return false;
+            }
+
+            return true;
+        }
+
+        public string ReceiveStringMessage()
+        {
+            try
+            {
+                InteractWithServer interactionWithServer = new InteractWithServer(Sender);
+                return interactionWithServer.ReceiveString();
             }
             catch (Exception ex)
             {
                 SimpleLogs.WriteToFile("[CommunicationWithServer.cs][ERROR] " + ex.ToString());
                 return "";
+            }
+        }
+
+        public byte[] ReceiveRawData()
+        {
+            try
+            {
+                InteractWithServer interactionWithServer = new InteractWithServer(Sender);
+                return interactionWithServer.ReceiveRawData();
+            }
+            catch (Exception ex)
+            {
+                SimpleLogs.WriteToFile("[CommunicationWithServer.cs][ERROR] " + ex.ToString());
+                return new byte[] { };
             }
         }
 
@@ -101,18 +134,32 @@ namespace ClientSide
             Sender = handler;
         }
 
-        public string ReceiveData()
+        public string ReceiveString()
         {
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[Constants.BufferSize];
             int bytesRead = Sender.Receive(buffer);
 
             return Encoding.UTF8.GetString(buffer, 0, bytesRead);
         }
 
-        public void SendData(string data)
+        public byte[] ReceiveRawData()
+        {
+            byte[] buffer = new byte[Constants.BufferSize];
+            Sender.Receive(buffer);
+
+            return buffer;
+        }
+
+        public void SendString(string data)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(data);
             Sender.Send(bytes);
         }
+
+        public void SendRawData(byte[] bytes)
+        {
+            Sender.Send(bytes);
+        }
+      
     }
 }
