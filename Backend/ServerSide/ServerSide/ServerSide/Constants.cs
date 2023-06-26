@@ -13,5 +13,11 @@ namespace ServerSide
         public const int EncryptSizeBytes = 128;
 
         public const int BufferSize = 6144;
+
+        public const bool DebugMode = true;
+
+        public const int port = 11000;
+
+        public const string ip = "";
     }
 }

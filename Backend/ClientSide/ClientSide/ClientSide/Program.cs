@@ -13,9 +13,9 @@ namespace ClientSide
         static void Main(string[] args)
         {
             ClientCore core = new ClientCore();
-            core.StartCommunicateWithServer();
+            _ = core.StartCommunicateWithServer();
 
-            Console.ReadLine();
+            while (true) { }
         }
     }
 }

@@ -1,8 +1,8 @@
 D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ServerSide\ServerSide\ServerSide\bin\Debug\ServerSide.exe.config
 D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ServerSide\ServerSide\ServerSide\bin\Debug\ServerSide.exe
 D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ServerSide\ServerSide\ServerSide\bin\Debug\ServerSide.pdb
-D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ServerSide\ServerSide\ServerSide\obj\Debug\ServerSide.csproj.AssemblyReference.cache
-D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ServerSide\ServerSide\ServerSide\obj\Debug\ServerSide.csproj.SuggestedBindingRedirects.cache
 D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ServerSide\ServerSide\ServerSide\obj\Debug\ServerSide.csproj.CoreCompileInputs.cache
 D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ServerSide\ServerSide\ServerSide\obj\Debug\ServerSide.exe
 D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ServerSide\ServerSide\ServerSide\obj\Debug\ServerSide.pdb
+D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ServerSide\ServerSide\ServerSide\obj\Debug\ServerSide.csproj.AssemblyReference.cache
+D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ServerSide\ServerSide\ServerSide\obj\Debug\ServerSide.csproj.SuggestedBindingRedirects.cache

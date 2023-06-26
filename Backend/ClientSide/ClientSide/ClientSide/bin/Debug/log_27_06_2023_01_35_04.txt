@@ -1,0 +1,15 @@
+[27/06/2023 01:35:04] Log file was created
+[27/06/2023 01:35:06] [CommunicationWithServer.cs][ERROR] System.ObjectDisposedException: Cannot access a disposed object.
+Object name: 'System.Net.Sockets.NetworkStream'.
+   at System.Net.Sockets.NetworkStream.EndWrite(IAsyncResult asyncResult)
+   at System.IO.Stream.<>c.<BeginEndWriteAsync>b__53_1(Stream stream, IAsyncResult asyncResult)
+   at System.Threading.Tasks.TaskFactory`1.FromAsyncTrimPromise`1.Complete(TInstance thisRef, Func`3 endMethod, IAsyncResult asyncResult, Boolean requiresSynchronization)
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.GetResult()
+   at ClientSide.InteractWithServer.<SendMessage>d__1.MoveNext() in D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ClientSide\ClientSide\ClientSide\CommunicationWithServer.cs:line 127
+[27/06/2023 01:35:07] [CommunicationWithServer.cs][ERROR] System.ObjectDisposedException: Cannot access a disposed object.
+Object name: 'System.Net.Sockets.TcpClient'.
+   at System.Net.Sockets.TcpClient.GetStream()
+   at ClientSide.InteractWithServer.<SendMessage>d__1.MoveNext() in D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ClientSide\ClientSide\ClientSide\CommunicationWithServer.cs:line 125

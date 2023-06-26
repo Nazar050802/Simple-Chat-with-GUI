@@ -14,6 +14,8 @@ namespace ServerSide
         {
             ServerCore core = new ServerCore(); 
             core.StartServer();
+
+            while (true) { }
         }
     }
 }

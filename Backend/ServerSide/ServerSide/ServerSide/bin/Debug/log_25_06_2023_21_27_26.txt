@@ -1,4 +1,0 @@
-[25/06/2023 21:27:26] Log file was created
-[25/06/2023 21:27:29] [CommunicationWithClient.cs] [ERROR] System.IndexOutOfRangeException: Index was outside the bounds of the array.
-   at ServerSide.RSAGenerating.DecryptIntoString(Byte[] data) in D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ServerSide\ServerSide\ServerSide\RSAEncryption.cs:line 129
-   at ServerSide.ClientHandler.Handle() in D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ServerSide\ServerSide\ServerSide\CommunicationWithClient.cs:line 75

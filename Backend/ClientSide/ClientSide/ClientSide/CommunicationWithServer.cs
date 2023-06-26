@@ -15,97 +15,63 @@ namespace ClientSide
 {
     internal class CommunicationWithServer
     {
-        private Socket Sender { get; set; }
-        private IPEndPoint IpEndPoint {get; set;}
+        private TcpClient Client { get; set; }
+        private CancellationTokenSource cancellationTokenSource;
+        private BasicClient BasicClientInfo { get; set; }
 
-        public CommunicationWithServer(Socket sender, IPEndPoint ipEndPoint)
+        public CommunicationWithServer(TcpClient client, BasicClient basicClientInfo)
         {
-            IpEndPoint = ipEndPoint;    
-            Sender = sender;
+            Client = client;
+            BasicClientInfo = basicClientInfo;
+            cancellationTokenSource = new CancellationTokenSource();
         }
-        
-        public void EstablishConnectionWithServer()
+
+        public async Task ConnectClientAsync()
+        {
+            await Client.ConnectAsync(BasicClientInfo.IpAddress, BasicClientInfo.Port);
+        }
+
+        public async Task EstablishConnectionWithServer()
         {
             while (!IsClientConnected())
             {
                 try
                 {
-                    Sender.Connect(IpEndPoint);
+                    await ConnectClientAsync();
                 }
                 catch (Exception ex)
                 {
                     SimpleLogs.WriteToFile("[CommunicationWithServer.cs][ERROR] " + ex.ToString());
-                    Thread.Sleep(1000);
+                    await Task.Delay(1000);
                 }
             }
         }
 
-        public bool SendStringMessage(string message="")
+        public void StartToReveiveMessages()
         {
-            try
-            {
-                InteractWithServer interactionWithServer = new InteractWithServer(Sender);
-                interactionWithServer.SendString(message);
-            }
-            catch (Exception ex)
-            {
-                SimpleLogs.WriteToFile("[CommunicationWithServer.cs][ERROR] " + ex.ToString());
-                return false;
-            }
-
-            return true;
+            InteractWithServer interactWithServer = new InteractWithServer();
+            _ = Task.Run(() => interactWithServer.ReceiveMessages(Client, cancellationTokenSource.Token));
         }
 
-        public bool SendRawData(byte[] bytes)
+        public async Task StartToSendMessages()
         {
-            try
-            {
-                InteractWithServer interactionWithServer = new InteractWithServer(Sender);
-                interactionWithServer.SendRawData(bytes);
-            }
-            catch (Exception ex)
-            {
-                SimpleLogs.WriteToFile("[CommunicationWithServer.cs][ERROR] " + ex.ToString());
-                return false;
-            }
+            InteractWithServer interactWithServer = new InteractWithServer();
+            Console.WriteLine("Enter messages to send (press Enter to send, type 'exit' to disconnect):");
 
-            return true;
-        }
-
-        public string ReceiveStringMessage()
-        {
-            try
+            string message;
+            do
             {
-                InteractWithServer interactionWithServer = new InteractWithServer(Sender);
-                return interactionWithServer.ReceiveString();
-            }
-            catch (Exception ex)
-            {
-                SimpleLogs.WriteToFile("[CommunicationWithServer.cs][ERROR] " + ex.ToString());
-                return "";
-            }
-        }
-
-        public byte[] ReceiveRawData()
-        {
-            try
-            {
-                InteractWithServer interactionWithServer = new InteractWithServer(Sender);
-                return interactionWithServer.ReceiveRawData();
-            }
-            catch (Exception ex)
-            {
-                SimpleLogs.WriteToFile("[CommunicationWithServer.cs][ERROR] " + ex.ToString());
-                return new byte[] { };
-            }
+                message = Console.ReadLine();
+                await interactWithServer.SendMessage(Client, message);
+            } while (message != "exit");
         }
 
         public bool CloseConnection()
         {
             try
             {
-                Sender.Shutdown(SocketShutdown.Both);
-                Sender.Close();
+                cancellationTokenSource.Cancel();
+                Client.Close();
 
                 Console.WriteLine("The communication has finished.");
             }
@@ -115,51 +81,57 @@ namespace ClientSide
                 return false;
             }
 
-            return true; 
+            return true;
         }
 
         private bool IsClientConnected()
         {
-            return Sender.Connected;
+            return Client.Connected;
         }
 
     }
 
     class InteractWithServer
     {
-        private Socket Sender { get; set; }
 
-        public InteractWithServer(Socket handler)
+        public async Task ReceiveMessages(TcpClient Client, CancellationToken cancellationToken)
         {
-            Sender = handler;
+            try
+            {
+                NetworkStream stream = Client.GetStream();
+                byte[] buffer = new byte[Constants.BufferSize];
+                int bytesRead;
+
+                while (!cancellationToken.IsCancellationRequested &&
+                       (bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
+                {
+                    string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                    Console.WriteLine(message);
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                SimpleLogs.WriteToFile("[CommunicationWithServer.cs][ERROR] " + ex.ToString());
+            }
+            finally
+            {
+                Client.Close();
+            }
         }
 
-        public string ReceiveString()
+        public async Task SendMessage(TcpClient Client, string message)
         {
-            byte[] buffer = new byte[Constants.BufferSize];
-            int bytesRead = Sender.Receive(buffer);
-
-            return Encoding.UTF8.GetString(buffer, 0, bytesRead);
+            try
+            {
+                NetworkStream stream = Client.GetStream();
+                byte[] buffer = Encoding.UTF8.GetBytes(message);
+                await stream.WriteAsync(buffer, 0, buffer.Length);
+            }
+            catch (Exception ex)
+            {
+                SimpleLogs.WriteToFile("[CommunicationWithServer.cs][ERROR] " + ex.ToString());
+            }
         }
-
-        public byte[] ReceiveRawData()
-        {
-            byte[] buffer = new byte[Constants.BufferSize];
-            Sender.Receive(buffer);
-
-            return buffer;
-        }
-
-        public void SendString(string data)
-        {
-            byte[] bytes = Encoding.UTF8.GetBytes(data);
-            Sender.Send(bytes);
-        }
-
-        public void SendRawData(byte[] bytes)
-        {
-            Sender.Send(bytes);
-        }
-      
     }
 }

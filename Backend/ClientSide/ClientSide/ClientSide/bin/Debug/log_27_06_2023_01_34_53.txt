@@ -1,0 +1,34 @@
+[27/06/2023 01:34:53] Log file was created
+[27/06/2023 01:34:55] [CommunicationWithServer.cs][ERROR] System.Net.Sockets.SocketException (0x80004005): No connection could be made because the target machine actively refused it 127.0.0.1:11000
+   at System.Net.Sockets.Socket.InternalEndConnect(IAsyncResult asyncResult)
+   at System.Net.Sockets.Socket.EndConnect(IAsyncResult asyncResult)
+   at System.Net.Sockets.TcpClient.EndConnect(IAsyncResult asyncResult)
+   at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.GetResult()
+   at ClientSide.CommunicationWithServer.<ConnectClientAsync>d__10.MoveNext() in D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ClientSide\ClientSide\ClientSide\CommunicationWithServer.cs:line 31
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.GetResult()
+   at ClientSide.CommunicationWithServer.<EstablishConnectionWithServer>d__11.MoveNext() in D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ClientSide\ClientSide\ClientSide\CommunicationWithServer.cs:line 40
+[27/06/2023 01:34:59] [CommunicationWithServer.cs][ERROR] System.ObjectDisposedException: Cannot access a disposed object.
+Object name: 'System.Net.Sockets.NetworkStream'.
+   at System.Net.Sockets.NetworkStream.EndRead(IAsyncResult asyncResult)
+   at System.IO.Stream.<>c.<BeginEndReadAsync>b__43_1(Stream stream, IAsyncResult asyncResult)
+   at System.Threading.Tasks.TaskFactory`1.FromAsyncTrimPromise`1.Complete(TInstance thisRef, Func`3 endMethod, IAsyncResult asyncResult, Boolean requiresSynchronization)
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.CompilerServices.TaskAwaiter.ThrowForNonSuccess(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()
+   at ClientSide.InteractWithServer.<ReceiveMessages>d__0.MoveNext() in D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ClientSide\ClientSide\ClientSide\CommunicationWithServer.cs:line 105
+[27/06/2023 01:35:01] [CommunicationWithServer.cs][ERROR] System.ObjectDisposedException: Cannot access a disposed object.
+Object name: 'System.Net.Sockets.TcpClient'.
+   at System.Net.Sockets.TcpClient.GetStream()
+   at ClientSide.InteractWithServer.<SendMessage>d__1.MoveNext() in D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ClientSide\ClientSide\ClientSide\CommunicationWithServer.cs:line 125
+[27/06/2023 01:35:02] [CommunicationWithServer.cs][ERROR] System.ObjectDisposedException: Cannot access a disposed object.
+Object name: 'System.Net.Sockets.TcpClient'.
+   at System.Net.Sockets.TcpClient.GetStream()
+   at ClientSide.InteractWithServer.<SendMessage>d__1.MoveNext() in D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ClientSide\ClientSide\ClientSide\CommunicationWithServer.cs:line 125

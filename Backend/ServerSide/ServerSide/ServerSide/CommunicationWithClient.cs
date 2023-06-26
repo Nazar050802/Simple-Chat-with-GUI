@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,100 +14,69 @@ namespace ServerSide
 {
     internal class CommunicationWithClient
     {
-        private Socket SListener { get; set; }
-
-        public CommunicationWithClient(Socket sListener) 
+        private TcpListener Listener { get; set; }
+        private ConcurrentDictionary<string, TcpClient> clients;
+        
+        public CommunicationWithClient(TcpListener listener)
         {
-            SListener = sListener;
+            Listener = listener;
+            clients = new ConcurrentDictionary<string, TcpClient>();
         }
 
-        public void StartSession()
+        public async Task HandleClientAsync(TcpClient client)
         {
-            try 
-            { 
-                Socket handler = SListener.Accept();
-                ThreadPool.QueueUserWorkItem(HandleClient, handler);
+            string clientKey = client.Client.RemoteEndPoint.ToString();
+            clients.TryAdd(clientKey, client);
 
-                int workerThreads, completionPortThreads;
-                ThreadPool.GetAvailableThreads(out workerThreads, out completionPortThreads);
+            Console.WriteLine("Client connected: " + clientKey);
 
-                // +1 for the current thread
-                Console.WriteLine("Active Threads: " + (workerThreads + 1)); 
-            }
-            catch (Exception ex)
-            {
-                SimpleLogs.WriteToFile(ex.ToString());
-            }
-        }
-
-        private void HandleClient(object handlerObj)
-        {
-            Socket handler = (Socket)handlerObj;
-            var clientHandler = new ClientHandler(handler);
-            clientHandler.Handle();
-        }
-    }
-
-    public class ClientHandler
-    {
-        private Socket Handler { get; set; }
-
-        public ClientHandler(Socket handler)
-        {
-            Handler = handler;
-        }
-
-        public void Handle()
-        {
             try
             {
-                InteractWithClient interactWithClient = new InteractWithClient(Handler);
+                NetworkStream stream = client.GetStream();
+                byte[] buffer = new byte[Constants.BufferSize];
+                int bytesRead;
 
-                // Create a Timeout for Connection with Client
-                Handler.ReceiveTimeout = Constants.TimeOutToDisconnectClient;
-
-                RSAGenerating rsaGenerating = new RSAGenerating();
-                interactWithClient.SendString(rsaGenerating.PublicKey);
-
-
-                // Get data from Client
-                byte[] requestData = interactWithClient.ReceiveRawData();
-
-                Console.WriteLine(rsaGenerating.DecryptIntoString(requestData));
-
-                //// Send reply to Client
-                //string reply = interactWithClient.GenerateReply(requestData);
-                //interactWithClient.SendData(reply);
-            }
-            catch (SocketException ex)
-            {
-                // Exception for Timeout Error
-                if (ex.SocketErrorCode == SocketError.TimedOut)
+                while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
                 {
-                    HandleTimeout(ex);
-                }
-                else
-                {
-                    HandleException(ex, "[ERROR]");
+                    string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                    Console.WriteLine("Received from " + clientKey + ": " + message);
+
+                    // Broadcast the received message to all connected clients
+                    BroadcastMessage(message, clientKey);
                 }
             }
             catch (Exception ex)
             {
-                HandleException(ex, "[ERROR]");
+                Console.WriteLine("Error occurred with client " + clientKey + ": " + ex.Message);
             }
-            finally 
+            finally
             {
-                CloseConnection();
+                clients.TryRemove(clientKey, out _);
+                client.Close();
+                Console.WriteLine("Client disconnected: " + clientKey);
             }
         }
 
-        private void HandleTimeout(Exception ex)
+        public void BroadcastMessage(string message, string senderKey)
         {
-            string timeoutMessage = "The connection was closed due to a timeout";
-            byte[] timeoutBytes = Encoding.UTF8.GetBytes(timeoutMessage);
-            Handler.Send(timeoutBytes);
+            byte[] buffer = Encoding.UTF8.GetBytes(message);
 
-            Console.WriteLine(timeoutMessage);
+            foreach (var kvp in clients)
+            {
+                if (kvp.Key != senderKey)
+                {
+                    TcpClient client = kvp.Value;
+                    NetworkStream stream = client.GetStream();
+                    stream.Write(buffer, 0, buffer.Length);
+                }
+            }
+        }
+
+        private void HandleTimeoutAsync(Exception ex, Socket Handler)
+        {
+            string timeOutMessage = "The connection was closed due to a timeout";
+
+            Console.WriteLine(timeOutMessage);
 
             HandleException(ex, "[INFO]");
         }
@@ -116,14 +86,15 @@ namespace ServerSide
             SimpleLogs.WriteToFile($"[CommunicationWithClient.cs] {additionalText} " + ex.ToString());
         }
 
-        private bool CloseConnection()
+        private bool CloseConnection(TcpClient client)
         {
             try
             {
-                Handler.Shutdown(SocketShutdown.Both);
-                Handler.Close();
+                string clientKey = client.Client.RemoteEndPoint.ToString();
+                clients.TryRemove(clientKey, out _);
+                client.Close();
 
-                Console.WriteLine("The thread has finished running.");
+                Console.WriteLine("Client disconnected: " + clientKey);
             }
             catch (Exception ex)
             {
@@ -133,47 +104,15 @@ namespace ServerSide
 
             return true;
         }
-
-        private bool IsClientConnected()
-        {
-            return Handler.Connected;
-        }
     }
 
     class InteractWithClient
     {
-        private Socket Handler { get; set; }
+        private TcpListener Handler { get; set; }
 
-        public InteractWithClient(Socket handler)
+        public InteractWithClient(TcpListener handler)
         {
             Handler = handler;
-        }
-
-        public string ReceiveString()
-        {
-            byte[] buffer = new byte[Constants.BufferSize];
-            int bytesRead = Handler.Receive(buffer);
-
-            return Encoding.UTF8.GetString(buffer, 0, bytesRead);
-        }
-
-        public byte[] ReceiveRawData()
-        {
-            byte[] buffer = new byte[Constants.BufferSize];
-            Handler.Receive(buffer);
-
-            return buffer;
-        }
-
-        public void SendString(string data)
-        {
-            byte[] bytes = Encoding.UTF8.GetBytes(data);
-            Handler.Send(bytes);
-        }
-
-        public void SendRawData(byte[] bytes)
-        {
-            Handler.Send(bytes);
         }
     }
 }
