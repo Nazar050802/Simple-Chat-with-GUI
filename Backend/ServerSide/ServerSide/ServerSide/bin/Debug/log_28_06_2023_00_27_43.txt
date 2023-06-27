@@ -1,7 +1,0 @@
-[28/06/2023 00:27:43] Log file was created
-[28/06/2023 00:27:49] [CommunicationWithClient.cs][ERROR] System.Security.Cryptography.CryptographicException: Error occurred while decoding OAEP padding.
-   at System.Security.Cryptography.RSACryptoServiceProvider.DecryptKey(SafeKeyHandle pKeyContext, Byte[] pbEncryptedKey, Int32 cbEncryptedKey, Boolean fOAEP, ObjectHandleOnStack ohRetDecryptedKey)
-   at System.Security.Cryptography.RSACryptoServiceProvider.Decrypt(Byte[] rgb, Boolean fOAEP)
-   at ServerSide.RSAGenerating.DecryptRawData(Byte[] data) in D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ServerSide\ServerSide\ServerSide\RSAEncryption.cs:line 61
-   at ServerSide.RSAGenerating.DecryptIntoString(Byte[] data) in D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ServerSide\ServerSide\ServerSide\RSAEncryption.cs:line 113
-   at ServerSide.InteractWithClient.<ReceiveMessageWithEncryptionAsync>d__7.MoveNext() in D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ServerSide\ServerSide\ServerSide\CommunicationWithClient.cs:line 169
