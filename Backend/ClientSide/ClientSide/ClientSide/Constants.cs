@@ -14,8 +14,10 @@ namespace ServerSide
 
         public const bool DebugMode = true;
 
-        public const int port = 11000;
+        public const int DefaultPort = 11000;
 
-        public const string ip = "";
+        public const string DefaultIP = "127.0.0.1";
+
+        public const int DelayForReconnect = 5000;
     }
 }

@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace ServerSide
 {
-    internal class Users
+    internal class Room
     {
+
+        public int Id { get; set; }  
+        public string Name { get; set; }
+
 
     }
 }

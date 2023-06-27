@@ -17,7 +17,7 @@ namespace ServerSide
     {
         protected string IpAddress { get; set; }
 
-        public ExternalIpAdressProvider(string ipAddress = "127.0.0.1")
+        public ExternalIpAdressProvider(string ipAddress = Constants.DefaultIP)
         {
             IpAddress = ipAddress;
         }
@@ -36,7 +36,7 @@ namespace ServerSide
 
         private int Port { get; set; }
 
-        public BasicInfoIpAddress(bool debugMode, string ipAddressString = "127.0.0.1", int port = 11000)
+        public BasicInfoIpAddress(bool debugMode, string ipAddressString = Constants.DefaultIP, int port = Constants.DefaultPort)
         {
             DebugMode = debugMode;
             Port = port;

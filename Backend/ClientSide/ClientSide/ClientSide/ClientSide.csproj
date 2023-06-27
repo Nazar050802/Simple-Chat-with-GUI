@@ -52,7 +52,6 @@
     <Compile Include="RSAEncryption.cs" />
     <Compile Include="SimpleLogs.cs" />
     <Compile Include="BasicClient.cs" />
-    <Compile Include="ScenariosOfUsing.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

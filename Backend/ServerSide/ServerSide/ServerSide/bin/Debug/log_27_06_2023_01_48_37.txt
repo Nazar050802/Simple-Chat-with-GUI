@@ -1,0 +1,14 @@
+[27/06/2023 01:48:37] Log file was created
+[27/06/2023 01:48:52] [CommunicationWithClient.cs][ERROR] System.ObjectDisposedException: Cannot access a disposed object.
+Object name: 'System.Net.Sockets.Socket'.
+   at System.Net.Sockets.Socket.get_RemoteEndPoint()
+   at ServerSide.CommunicationWithClient.CloseConnection(TcpClient client) in D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ServerSide\ServerSide\ServerSide\CommunicationWithClient.cs:line 84
+[27/06/2023 01:49:05] [CommunicationWithClient.cs]  System.ObjectDisposedException: Cannot access a disposed object.
+Object name: 'System.Net.Sockets.TcpClient'.
+   at System.Net.Sockets.TcpClient.GetStream()
+   at ServerSide.CommunicationWithClient.BroadcastMessage(String message, String senderKey) in D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ServerSide\ServerSide\ServerSide\CommunicationWithClient.cs:line 60
+   at ServerSide.CommunicationWithClient.<HandleClientAsync>d__6.MoveNext() in D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ServerSide\ServerSide\ServerSide\CommunicationWithClient.cs:line 37
+[27/06/2023 01:49:05] [CommunicationWithClient.cs][ERROR] System.ObjectDisposedException: Cannot access a disposed object.
+Object name: 'System.Net.Sockets.Socket'.
+   at System.Net.Sockets.Socket.get_RemoteEndPoint()
+   at ServerSide.CommunicationWithClient.CloseConnection(TcpClient client) in D:\Programming\GitHub\Simple-Chat-with-GUI\Backend\ServerSide\ServerSide\ServerSide\CommunicationWithClient.cs:line 84

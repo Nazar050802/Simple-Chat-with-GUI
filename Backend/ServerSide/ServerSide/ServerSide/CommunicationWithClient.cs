@@ -14,71 +14,101 @@ namespace ServerSide
 {
     internal class CommunicationWithClient
     {
-        private TcpListener Listener { get; set; }
-        private ConcurrentDictionary<string, TcpClient> clients;
+        private ConcurrentBag<User> clients;
         
         public CommunicationWithClient(TcpListener listener)
         {
-            Listener = listener;
-            clients = new ConcurrentDictionary<string, TcpClient>();
+            clients = new ConcurrentBag<User>();
         }
 
         public async Task HandleClientAsync(TcpClient client)
         {
-            string clientKey = client.Client.RemoteEndPoint.ToString();
-            clients.TryAdd(clientKey, client);
+            User tempUserInfo = new User(client);
 
-            Console.WriteLine("Client connected: " + clientKey);
+            InteractWithClient interactWithClient = new InteractWithClient(client, new RSAGenerating(), tempUserInfo.rsaGeneratingServer);
+
+            Tuple<User, InteractWithClient> outputInitialSetting  = await InitialSetting(tempUserInfo, interactWithClient);
+            tempUserInfo = outputInitialSetting.Item1;
+            interactWithClient = outputInitialSetting.Item2;
+
+            clients.Add(tempUserInfo);
 
             try
             {
-                NetworkStream stream = client.GetStream();
-                byte[] buffer = new byte[Constants.BufferSize];
-                int bytesRead;
-
-                while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-                {
-                    string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                    Console.WriteLine("Received from " + clientKey + ": " + message);
-
-                    // Broadcast the received message to all connected clients
-                    BroadcastMessage(message, clientKey);
-                }
+                await StartReceiveAndSendMessagesAsync(tempUserInfo, interactWithClient);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error occurred with client " + clientKey + ": " + ex.Message);
+                Console.WriteLine("Error occurred with client " + tempUserInfo.Id + ": " + ex.Message);
+                HandleException(ex);
             }
             finally
             {
-                clients.TryRemove(clientKey, out _);
-                client.Close();
-                Console.WriteLine("Client disconnected: " + clientKey);
+                interactWithClient.CloseStreamConnection();
+                CloseConnection(client, tempUserInfo);
             }
         }
 
-        public void BroadcastMessage(string message, string senderKey)
+        public async Task StartReceiveAndSendMessagesAsync(User user, InteractWithClient interactWithClient)
         {
-            byte[] buffer = Encoding.UTF8.GetBytes(message);
-
-            foreach (var kvp in clients)
+            string message = await interactWithClient.ReceiveMessageWithEncryptionAsync();
+            while (message != "")
             {
-                if (kvp.Key != senderKey)
+                Console.WriteLine($"Received from {user.Id}({user.Name}): {message}");
+
+                // Broadcast the received message to all connected clients
+                BroadcastMessage(message, user);
+
+                message = await interactWithClient.ReceiveMessageWithEncryptionAsync();
+            }
+        }
+
+        public async Task<Tuple<User, InteractWithClient>> InitialSetting(User user, InteractWithClient interactWithClient)
+        {
+            try
+            {
+                // Send server public key to client
+                await interactWithClient.SendMessageAsync(user.rsaGeneratingServer.PublicKey);
+
+                // Get client public key
+                user.rsaGeneratingClient.SetPublicKeyFromString(await interactWithClient.ReceiveMessageAsync());
+                interactWithClient.rsaGeneratingClient = user.rsaGeneratingClient;
+
+                // Get user username
+                user.Name = await interactWithClient.ReceiveMessageWithEncryptionAsync();
+            }
+            catch (Exception ex)
+            {
+                HandleException(ex);
+            }
+
+            return new Tuple<User, InteractWithClient>(user, interactWithClient);
+        }
+
+        public void BroadcastMessage(string message, User currentUser)
+        {
+            foreach (User user in clients)
+            {
+                if (user.Id != currentUser.Id)
                 {
-                    TcpClient client = kvp.Value;
-                    NetworkStream stream = client.GetStream();
-                    stream.Write(buffer, 0, buffer.Length);
+                    InteractWithClient interactWithClient = new InteractWithClient(user.TcpConnection, user.rsaGeneratingClient, user.rsaGeneratingServer);
+                    _ = interactWithClient.SendMessageWithEncryptionAsync(message);
                 }
             }
         }
 
-        private void HandleTimeoutAsync(Exception ex, Socket Handler)
+        private void RemoveItemFromConcurrentBag(User userToRemove)
         {
-            string timeOutMessage = "The connection was closed due to a timeout";
+            ConcurrentBag<User> newBag = new ConcurrentBag<User>();
+            foreach (User user in clients)
+            {
+                if (user != userToRemove)
+                {
+                    newBag.Add(user);
+                }
+            }
 
-            Console.WriteLine(timeOutMessage);
-
-            HandleException(ex, "[INFO]");
+            clients = newBag;
         }
 
         private void HandleException(Exception ex, string additionalText = "")
@@ -86,15 +116,14 @@ namespace ServerSide
             SimpleLogs.WriteToFile($"[CommunicationWithClient.cs] {additionalText} " + ex.ToString());
         }
 
-        private bool CloseConnection(TcpClient client)
+        private bool CloseConnection(TcpClient client, User currentUser)
         {
             try
             {
-                string clientKey = client.Client.RemoteEndPoint.ToString();
-                clients.TryRemove(clientKey, out _);
+                RemoveItemFromConcurrentBag(currentUser);
                 client.Close();
 
-                Console.WriteLine("Client disconnected: " + clientKey);
+                Console.WriteLine("Client disconnected: " + currentUser.Id);
             }
             catch (Exception ex)
             {
@@ -108,11 +137,93 @@ namespace ServerSide
 
     class InteractWithClient
     {
-        private TcpListener Handler { get; set; }
+        private NetworkStream Stream { get; set; }
 
-        public InteractWithClient(TcpListener handler)
+        public RSAGenerating rsaGeneratingServer;
+
+        public RSAGenerating rsaGeneratingClient;
+
+        public InteractWithClient(TcpClient client, RSAGenerating rsaClient, RSAGenerating rsaServer)
         {
-            Handler = handler;
+            Stream = client.GetStream();
+
+            rsaGeneratingClient = rsaClient;
+            rsaGeneratingServer = rsaServer;
+        }
+
+        public async Task<string> ReceiveMessageWithEncryptionAsync()
+        {
+            string message = "";
+            try
+            {
+                byte[] buffer = new byte[Constants.BufferSize];
+                int bytesRead;
+
+                // Read the message
+                bytesRead = await Stream.ReadAsync(buffer, 0, buffer.Length);
+                message = rsaGeneratingServer.DecryptIntoString(buffer);
+
+            }
+            catch (Exception ex)
+            {
+                SimpleLogs.WriteToFile("[CommunicationWithClient.cs][ERROR] " + ex.ToString());
+            }
+
+            return message;
+        }
+
+        public async Task<string> ReceiveMessageAsync()
+        {
+            string message = "";
+            try
+            {
+                byte[] buffer = new byte[Constants.BufferSize];
+                int bytesRead;
+
+                // Read the message
+                bytesRead = await Stream.ReadAsync(buffer, 0, buffer.Length);
+                message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+
+            }
+            catch (Exception ex)
+            {
+                SimpleLogs.WriteToFile("[CommunicationWithClient.cs][ERROR] " + ex.ToString());
+            }
+
+            return message;
+        }
+
+        public async Task SendMessageWithEncryptionAsync(string message)
+        {
+            try
+            {
+                // Send message
+                byte[] buffer = rsaGeneratingClient.EncryptString(message);
+                await Stream.WriteAsync(buffer, 0, buffer.Length);
+            }
+            catch (Exception ex)
+            {
+                SimpleLogs.WriteToFile("[CommunicationWithClient.cs][ERROR] " + ex.ToString());
+            }
+        }
+
+        public async Task SendMessageAsync(string message)
+        {
+            try
+            {
+                // Send message
+                byte[] buffer = Encoding.UTF8.GetBytes(message);
+                await Stream.WriteAsync(buffer, 0, buffer.Length);
+            }
+            catch (Exception ex)
+            {
+                SimpleLogs.WriteToFile("[CommunicationWithClient.cs][ERROR] " + ex.ToString());
+            }
+        }
+
+        public void CloseStreamConnection()
+        {
+            Stream.Close();
         }
     }
 }

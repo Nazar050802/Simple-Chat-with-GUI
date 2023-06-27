@@ -32,6 +32,10 @@ namespace ClientSide
                 CommunicationWithServer communicationWithServer = new CommunicationWithServer(client, basicClient);
 
                 await communicationWithServer.EstablishConnectionWithServer();
+
+                Console.WriteLine("Write username: ");
+                await communicationWithServer.InitialSetting(Console.ReadLine());
+
                 communicationWithServer.StartToReveiveMessages();
                 await communicationWithServer.StartToSendMessages();
 

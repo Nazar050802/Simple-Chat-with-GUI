@@ -13,7 +13,6 @@ namespace ServerSide
     {
 
         public string PublicKey { get; protected set; }
-
         protected RSAParameters KeyParams { get; set; }
 
         public RSAGenerating()
