@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "me7vEIECkI72XnbfnElw7Iap9tU99lfT//DRTHQp+A89i1Uls4kFCwxOCtiGmApDXlYbkmn2iAVdyJjfwyptvg==",
+  "success": true,
+  "projectFilePath": "D:\\Programming\\GitHub\\Simple-Chat-with-GUI\\SimpleChatWithGUI\\ServerSide\\ServerSide\\ServerSide.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\nazar\\.nuget\\packages\\modernwpfui\\0.9.6\\modernwpfui.0.9.6.nupkg.sha512"
+  ],
+  "logs": []
+}
