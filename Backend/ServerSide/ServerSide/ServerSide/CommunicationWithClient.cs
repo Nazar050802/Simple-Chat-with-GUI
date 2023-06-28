@@ -15,10 +15,12 @@ namespace ServerSide
     internal class CommunicationWithClient
     {
         private ConcurrentBag<User> clients;
-        
+        private ConcurrentBag<Room> rooms;
+
         public CommunicationWithClient(TcpListener listener)
         {
             clients = new ConcurrentBag<User>();
+            rooms = new ConcurrentBag<Room>();
         }
 
         public async Task HandleClientAsync(TcpClient client)
@@ -76,6 +78,10 @@ namespace ServerSide
 
                 // Get user username
                 user.Name = await interactWithClient.ReceiveMessageWithEncryptionAsync();
+
+                // User select or create room
+                await SelectRoom(user, interactWithClient);
+                
             }
             catch (Exception ex)
             {
@@ -85,31 +91,82 @@ namespace ServerSide
             return new Tuple<User, InteractWithClient>(user, interactWithClient);
         }
 
+        public async Task SelectRoom(User user, InteractWithClient interactWithClient)
+        {
+            // Send room list
+            await interactWithClient.SendMessageWithEncryptionAsync(string.Join(",", rooms.Select(room => room.Name)));
+
+            // Choose or create room
+            string[] choosenRoomNameAndPassword = (await interactWithClient.ReceiveMessageWithEncryptionAsync()).Split(',');
+            Room foundRoom = rooms.FirstOrDefault(room => room.Name == choosenRoomNameAndPassword[0]);
+
+            string password = choosenRoomNameAndPassword[1];
+            if (foundRoom != null)
+            {
+                while (!foundRoom.ComparePassword(password))
+                {
+                    // Send message that password is wrong
+                    await interactWithClient.SendMessageWithEncryptionAsync(Constants.ServerMessageWrongRoomPassword);
+
+                    // Get new data
+                    password = (await interactWithClient.ReceiveMessageWithEncryptionAsync()).Split(',')[1];
+                }
+
+                user.CurrentRoomName = foundRoom.Name;
+                foundRoom.UsersInRoom.Add(user.Id);
+            }
+            else
+            {
+                // Create room using the login and password
+                Room createRoom = new Room(choosenRoomNameAndPassword[0], choosenRoomNameAndPassword[1]);
+                user.CurrentRoomName = createRoom.Name;
+                createRoom.UsersInRoom.Add(user.Id);
+
+                rooms.Add(createRoom);
+            }
+
+            // Send message that everything was success
+            await interactWithClient.SendMessageWithEncryptionAsync(Constants.ServerMessageSuccessJoinToRoom);
+        }
+
         public void BroadcastMessage(string message, User currentUser)
         {
-            foreach (User user in clients)
+            Room foundRoom = rooms.FirstOrDefault(room => room.Name == currentUser.CurrentRoomName);
+            List<User> usersInRoom = new List<User>();
+
+            if(foundRoom != null)
             {
-                if (user.Id != currentUser.Id)
+                foreach (string userId in foundRoom.UsersInRoom)
                 {
-                    InteractWithClient interactWithClient = new InteractWithClient(user.TcpConnection, user.rsaGeneratingClient, user.rsaGeneratingServer);
-                    _ = interactWithClient.SendMessageWithEncryptionAsync(message);
+                    User tempUser = clients.FirstOrDefault(user => user.Id == userId);
+                    usersInRoom.Add(tempUser);
+                }
+
+                foreach (User user in usersInRoom)
+                {
+                    if (user.Id != currentUser.Id)
+                    {
+                        InteractWithClient interactWithClient = new InteractWithClient(user.TcpConnection, user.rsaGeneratingClient, user.rsaGeneratingServer);
+                        _ = interactWithClient.SendMessageWithEncryptionAsync(message);
+                    }
                 }
             }
         }
 
-        private void RemoveItemFromConcurrentBag(User userToRemove)
+        private ConcurrentBag<T> RemoveItemFromConcurrentBag<T>(T itemToRemove, ConcurrentBag<T> oldBag)
         {
-            ConcurrentBag<User> newBag = new ConcurrentBag<User>();
-            foreach (User user in clients)
+            ConcurrentBag<T> newBag = new ConcurrentBag<T>();
+            foreach (T item in oldBag)
             {
-                if (user != userToRemove)
+                if (!item.Equals(itemToRemove))
                 {
-                    newBag.Add(user);
+                    newBag.Add(item);
                 }
             }
 
-            clients = newBag;
+            return newBag;
         }
+
 
         private void HandleException(Exception ex, string additionalText = "")
         {
@@ -120,10 +177,36 @@ namespace ServerSide
         {
             try
             {
-                RemoveItemFromConcurrentBag(currentUser);
+                clients = RemoveItemFromConcurrentBag<User>(currentUser, clients);
                 client.Close();
+                CloseRoom(currentUser);
 
                 Console.WriteLine("Client disconnected: " + currentUser.Id);
+            }
+            catch (Exception ex)
+            {
+                SimpleLogs.WriteToFile("[CommunicationWithClient.cs][ERROR] " + ex.ToString());
+                return false;
+            }
+
+            return true;
+        }
+
+
+        private bool CloseRoom(User currentUser)
+        {
+            try
+            {
+                Room foundRoom = rooms.FirstOrDefault(room => room.Name == currentUser.CurrentRoomName);
+                if (foundRoom != null)
+                {
+                    foundRoom.UsersInRoom = RemoveItemFromConcurrentBag<string>(currentUser.Id, foundRoom.UsersInRoom);
+                }
+
+                if (foundRoom.UsersInRoom.IsEmpty)
+                {
+                    rooms = RemoveItemFromConcurrentBag<Room>(foundRoom, rooms);
+                }
             }
             catch (Exception ex)
             {

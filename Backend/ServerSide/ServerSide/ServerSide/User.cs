@@ -21,7 +21,7 @@ namespace ServerSide
 
         public TcpClient TcpConnection { get; set; }
 
-        public int CurrentRoomId { get; set; }
+        public string CurrentRoomName { get; set; }
 
         public User(TcpClient client) {
 

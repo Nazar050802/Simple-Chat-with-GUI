@@ -61,6 +61,48 @@ namespace ClientSide
 
             // Send user username
             await interactWithServer.SendMessageWithEncryptionAsync(username);
+
+            // Join or create room
+            await JoinToRoom();
+        }
+
+        public async Task JoinToRoom()
+        {
+            Console.WriteLine("Choose the room from the list by input its name.");
+            Console.WriteLine("If you want to create your own room, write its name and then password for it.");
+
+            string roomNames = await interactWithServer.ReceiveMessageWithEncryptionAsync();
+            string[] arrayRoomNames = roomNames.Split(',');
+
+            if (arrayRoomNames.Length == 0)
+            {
+                Console.WriteLine("No rooms!");
+            }
+
+            foreach (string roomName in arrayRoomNames) {
+                Console.WriteLine($"    -> {roomName}");
+            }
+
+            Console.WriteLine("INPUT NAME: ");
+            string inputRoomName = Console.ReadLine();
+
+            Console.WriteLine("INPUT PASSWORD: ");
+            string inputRoomPassword = Console.ReadLine();
+
+            // Send data to the server
+            await interactWithServer.SendMessageWithEncryptionAsync($"{inputRoomName},{inputRoomPassword}");
+
+            // Wait for response
+            string response = await interactWithServer.ReceiveMessageWithEncryptionAsync();
+            while(response != Constants.ServerMessageSuccessJoinToRoom)
+            {
+                Console.WriteLine("WRONG PASSWORD!!!");
+                Console.WriteLine("INPUT PASSWORD: ");
+                inputRoomPassword = Console.ReadLine();
+
+                await interactWithServer.SendMessageWithEncryptionAsync($"{inputRoomName},{inputRoomPassword}");
+                response = await interactWithServer.ReceiveMessageWithEncryptionAsync();
+            }
         }
 
         public void StartToReveiveMessages()
