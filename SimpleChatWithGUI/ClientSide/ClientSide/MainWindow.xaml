@@ -10,34 +10,58 @@
         Title="" Height="480" Width="700">
 
     <Grid Background="#0E1721">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
 
-        <Grid Margin="0,0,0,354" Background="#17222B">
-            <Button Content="Change Room" Margin="10" VerticalAlignment="Center"/>
-            <TextBlock Margin="130,18,130,0" Text="Label" VerticalAlignment="Top" TextAlignment="Center" FontWeight="Bold" Height="19" Foreground="White" FontSize="16"/>
+        <Grid x:Name="chatGrid" Visibility="Hidden">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid Margin="0,0,0,354" Background="#17222B">
+                <Button Content="Change Room" Margin="10" VerticalAlignment="Center"/>
+                <TextBlock Margin="130,18,130,0" Text="Label" VerticalAlignment="Top" TextAlignment="Center" FontWeight="Bold" Height="19" Foreground="White" FontSize="16"/>
+            </Grid>
+
+            <ScrollViewer x:Name="ChatScrollViewer" Grid.Row="0" VerticalScrollBarVisibility="Auto" Margin="0,58,0,0">
+                <StackPanel x:Name="ChatContainer" Background="Transparent"/>
+            </ScrollViewer>
+
+            <Grid Grid.Row="1" Background="#17222B">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox x:Name="MessageTextBox" Margin="10" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Background="#273A4B" BorderBrush="#111920">
+                    <TextBox.Foreground>
+                        <SolidColorBrush Color="White"/>
+                    </TextBox.Foreground>
+                </TextBox>
+                <Button Grid.Column="1" Margin="10" Content="Send" Click="SendMessage"/>
+                <Button Content="Button" Margin="541,5,0,0" VerticalAlignment="Top" Click="Button_Click_1"/>
+            </Grid>
+
         </Grid>
 
-        <ScrollViewer x:Name="ChatScrollViewer" Grid.Row="0" VerticalScrollBarVisibility="Auto" Margin="0,58,0,0">
-            <StackPanel x:Name="ChatContainer" Background="Transparent"/>
-        </ScrollViewer>
+        <Grid>
 
-        <Grid Grid.Row="1" Background="#17222B">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+            <Label Content="Enter your nickname" HorizontalAlignment="Center" Margin="0,152,0,0" VerticalAlignment="Top" Foreground="White" FontSize="18" />
+            <Button Content="Login" Margin="0,241,0,0" VerticalAlignment="Top" Click="Button_Click" Width="256" Foreground="White" Background="#4776A8" HorizontalAlignment="Center"/>
+            <TextBox HorizontalAlignment="Center" TextWrapping="Wrap" 
+              Text="{Binding TextBoxPreviewText, Mode=OneWay}" VerticalAlignment="Top" Width="348" 
+              Background="#273A4B" BorderBrush="#111920" Opacity="0.5"
+              GotFocus="TextBox_GotFocus" Margin="0,191,0,0">
 
-            <TextBox x:Name="MessageTextBox" Margin="10" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Background="#273A4B" BorderBrush="#111920">
                 <TextBox.Foreground>
                     <SolidColorBrush Color="White"/>
                 </TextBox.Foreground>
             </TextBox>
-            <Button Grid.Column="1" Margin="10" Content="Send" Click="SendMessage"/>
-            <Button Content="Button" Margin="541,5,0,0" VerticalAlignment="Top" Click="Button_Click_1"/>
+
+            <Label Content="It is not recommended to use a nickname that refers to your real data" HorizontalAlignment="Center" Margin="0,421,0,0" VerticalAlignment="Top" Foreground="White" FontSize="12" />
         </Grid>
+
+
     </Grid>
 
 

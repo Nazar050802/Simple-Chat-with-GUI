@@ -22,7 +22,7 @@ namespace ClientSide
     /// </summary>
     public partial class MainWindow : Window
     {
-
+        public string TextBoxPreviewText { get; set; } = "Type here...";
         private List<(string userName, string message, bool senderOrReceiver)> chatMessages;
         private DispatcherTimer messageTimer;
 
@@ -35,10 +35,7 @@ namespace ClientSide
 
             ShowMessages();
 
-            SelectChangeRoom anotherWindow = new SelectChangeRoom();
-
-            // Show the window
-            anotherWindow.Show();
+            DataContext = this;
         }
 
         private void ShowMessages()
@@ -161,5 +158,23 @@ namespace ClientSide
 
             return hash;
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            chatGrid.Visibility = Visibility.Visible; 
+        }
+
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            TextBox tb = (TextBox)sender;
+
+            if (tb.Text == TextBoxPreviewText)
+            {
+                tb.Text = string.Empty;
+            }
+
+            tb.Opacity = 1;
+        }
+
     }
 }
