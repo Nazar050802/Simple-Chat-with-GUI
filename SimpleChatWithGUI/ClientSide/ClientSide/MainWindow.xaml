@@ -1,10 +1,44 @@
 ﻿<Window x:Class="ClientSide.MainWindow"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        ui:WindowHelper.UseModernWindowStyle="True"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClientSide"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid/>
+        Title="" Height="480" Width="700">
+
+    <Grid Background="#0E1721">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Margin="0,0,0,354" Background="#17222B">
+            <Button Content="Change Room" Margin="10" VerticalAlignment="Center"/>
+            <TextBlock Margin="130,18,130,0" Text="Label" VerticalAlignment="Top" TextAlignment="Center" FontWeight="Bold" Height="19" Foreground="White" FontSize="16"/>
+        </Grid>
+
+        <ScrollViewer x:Name="ChatScrollViewer" Grid.Row="0" VerticalScrollBarVisibility="Auto" Margin="0,58,0,0">
+            <StackPanel x:Name="ChatContainer" Background="Transparent"/>
+        </ScrollViewer>
+
+        <Grid Grid.Row="1" Background="#17222B">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox x:Name="MessageTextBox" Margin="10" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Background="#273A4B" BorderBrush="#111920">
+                <TextBox.Foreground>
+                    <SolidColorBrush Color="White"/>
+                </TextBox.Foreground>
+            </TextBox>
+            <Button Grid.Column="1" Margin="10" Content="Send" Click="SendMessage"/>
+            <Button Content="Button" Margin="541,5,0,0" VerticalAlignment="Top" Click="Button_Click_1"/>
+        </Grid>
+    </Grid>
+
+
 </Window>

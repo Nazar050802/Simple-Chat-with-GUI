@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET6_0;NETCOREAPP
 D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ClientSide\ClientSide\App.xaml
-11407045341
+31276109177
 
-5774741090
-1941709816142
-MainWindow.xaml;
+7-1009276350
+196229973204
+InputUserData.xaml;MainWindow.xaml;SelectChangeRoom.xaml;
 
-False
+True
 

@@ -56,10 +56,25 @@ namespace ServerSide
             string message = await interactWithClient.ReceiveMessageWithEncryptionAsync();
             while (message != "")
             {
-                SimpleLogs.WriteToFile("[CommunicationWithClient.cs][INFO] " + $"Received from {user.Id}({user.Name}): {message}");
+                switch (message)
+                {
+                    case Constants.ServerMessageGetListOfRooms:
+                        // User select or create room
+                        await SelectRoom(user, interactWithClient);
 
-                // Broadcast the received message to all connected clients
-                BroadcastMessage(message, user);
+                        break;
+
+                    case Constants.ServerMessageSendMessage:
+                        SimpleLogs.WriteToFile("[CommunicationWithClient.cs][INFO] " + $"Received from {user.Id}({user.Name}): {message}");
+
+                        // Broadcast the received message to all connected clients
+                        BroadcastMessage(message, user);
+
+                        break;
+
+                    default:
+                        break;
+                }
 
                 message = await interactWithClient.ReceiveMessageWithEncryptionAsync();
             }
@@ -78,10 +93,6 @@ namespace ServerSide
 
                 // Get user username
                 user.Name = await interactWithClient.ReceiveMessageWithEncryptionAsync();
-
-                // User select or create room
-                await SelectRoom(user, interactWithClient);
-                
             }
             catch (Exception ex)
             {
@@ -95,6 +106,9 @@ namespace ServerSide
         {
             // Send room list
             await interactWithClient.SendMessageWithEncryptionAsync(string.Join(",", rooms.Select(room => room.Name)));
+
+            // Delete user from current room
+            CloseRoom(user);
 
             // Choose or create room
             string[] choosenRoomNameAndPassword = (await interactWithClient.ReceiveMessageWithEncryptionAsync()).Split(',');
@@ -204,6 +218,10 @@ namespace ServerSide
                 if (foundRoom != null)
                 {
                     foundRoom.UsersInRoom = RemoveItemFromConcurrentBag<string>(currentUser.Id, foundRoom.UsersInRoom);
+                }
+                else
+                {
+                    return false;
                 }
 
                 if (foundRoom.UsersInRoom.IsEmpty)

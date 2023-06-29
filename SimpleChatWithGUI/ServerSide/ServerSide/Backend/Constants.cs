@@ -18,8 +18,18 @@ namespace ServerSide
 
         public const string DefaultIP = "127.0.0.1";
 
-        public const string ServerMessageWrongRoomPassword = "[WRONG_PASSWORD]";
+        public const string ServerMessageGetListOfRooms = "[GET_LIST_ROOMS]";
+
+        public const string ServerMessageSendMessage = "[SEND_MESSAGE]";
+
+        public const string ServerMessageGetMessage = "[GET_MESSAGE]";
+
+        public const string ServerMessageWrongName = "[WRONG_NAME]";
+
+        public const string ServerMessageSetName = "[SET_NAME]";
 
         public const string ServerMessageSuccessJoinToRoom = "[SUCCESS_JOIN_TO_ROOM]";
+
+        public const string ServerMessageWrongRoomPassword = "[WRONG_PASSWORD]";
     }
 }

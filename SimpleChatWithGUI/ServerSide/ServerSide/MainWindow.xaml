@@ -8,6 +8,7 @@
         ui:WindowHelper.UseModernWindowStyle="True"
         mc:Ignorable="d"
         Title="MainWindow" Height="459" Width="800">
+    
     <Grid>
         <TextBox x:Name="logTextBox" VerticalScrollBarVisibility="Auto" IsReadOnly="True" Margin="43,31,43,0" TextWrapping="Wrap" Text="LogInformationHere" VerticalAlignment="Top" Height="315"/>
         <TextBox x:Name="ipTextBox" HorizontalAlignment="Left" Margin="43,382,0,0" TextWrapping="Wrap" Text="127.0.0.1" VerticalAlignment="Top" Width="156" />
@@ -17,7 +18,7 @@
         <Label Content="IP ADDRESS: " HorizontalAlignment="Left" Margin="43,363,0,0" VerticalAlignment="Top"/>
         <Label Content="PORT: " HorizontalAlignment="Left" Margin="236,363,0,0" VerticalAlignment="Top"/>
         
-        <Button x:Name ="startServer" Content="START SERVER" Margin="577,382,0,0" VerticalAlignment="Top" Width="121" Click="Button_Click_Start_Server"/>
+        <Button x:Name ="startServer" Content="START SERVER" Margin="636,382,0,0" VerticalAlignment="Top" Width="121" Click="Button_Click_Start_Server"/>
     </Grid>
 
 
