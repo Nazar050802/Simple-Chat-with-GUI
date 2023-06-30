@@ -7,20 +7,22 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClientSide"
         mc:Ignorable="d"
-        Title="" Height="480" Width="700">
+        Title="" Height="480" Width="700"
+        Closed="Window_Closed"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen">
 
     <Grid Background="#0E1721">
 
-        <Grid x:Name="chatGrid" Visibility="Hidden">
+        <Grid x:Name="chatGrid" Visibility="Hidden" IsVisibleChanged="MyGrid_VisibilityChanged">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Grid Margin="0,0,0,354" Background="#17222B">
-                <Button Content="Change Room" Margin="10" VerticalAlignment="Center"/>
-                <TextBlock Margin="130,18,130,0" Text="Label" VerticalAlignment="Top" TextAlignment="Center" FontWeight="Bold" Height="19" Foreground="White" FontSize="16"/>
+            <Grid Margin="0,0,0,338" Background="#17222B">
+                <TextBlock x:Name="textBlockRoomName" Margin="130,16,130,0" Text="Label" VerticalAlignment="Top" TextAlignment="Center" FontWeight="Bold" Height="19" Foreground="White" FontSize="16"/>
             </Grid>
 
             <ScrollViewer x:Name="ChatScrollViewer" Grid.Row="0" VerticalScrollBarVisibility="Auto" Margin="0,58,0,0">
@@ -33,22 +35,22 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBox x:Name="MessageTextBox" Margin="10" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Background="#273A4B" BorderBrush="#111920">
+                <TextBox x:Name="messageTextBox" Margin="10" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Background="#273A4B" BorderBrush="#111920">
                     <TextBox.Foreground>
                         <SolidColorBrush Color="White"/>
                     </TextBox.Foreground>
                 </TextBox>
-                <Button Grid.Column="1" Margin="10" Content="Send" Click="SendMessage"/>
-                <Button Content="Button" Margin="541,5,0,0" VerticalAlignment="Top" Click="Button_Click_1"/>
+                <Button Grid.Column="1" Margin="10" Content="Send" Click="SendMessageAsync"  Background="#4776A8" Foreground="White"/>
             </Grid>
 
         </Grid>
 
-        <Grid>
+        <Grid x:Name="userDataGrid" Visibility="Hidden">
 
-            <Label Content="Enter your nickname" HorizontalAlignment="Center" Margin="0,152,0,0" VerticalAlignment="Top" Foreground="White" FontSize="18" />
-            <Button Content="Login" Margin="0,241,0,0" VerticalAlignment="Top" Click="Button_Click" Width="256" Foreground="White" Background="#4776A8" HorizontalAlignment="Center"/>
-            <TextBox HorizontalAlignment="Center" TextWrapping="Wrap" 
+            <Label Content="Enter your username" HorizontalAlignment="Center" Margin="0,152,0,0" VerticalAlignment="Top" Foreground="White" FontSize="18" />
+            <Label x:Name="labelUsernameAlreadyUse" Content="Username already in use, please select another username" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#9C1824" FontSize="12" Margin="0,15,0,0" Visibility="Hidden"/>
+            <Button Content="Login" Margin="0,245,0,0" VerticalAlignment="Top" Click="Button_ClickAsync" Width="256" Foreground="White" Background="#4776A8" HorizontalAlignment="Center"/>
+            <TextBox HorizontalAlignment="Center" TextWrapping="Wrap" x:Name="textBoxUsername"
               Text="{Binding TextBoxPreviewText, Mode=OneWay}" VerticalAlignment="Top" Width="348" 
               Background="#273A4B" BorderBrush="#111920" Opacity="0.5"
               GotFocus="TextBox_GotFocus" Margin="0,191,0,0">
@@ -58,11 +60,92 @@
                 </TextBox.Foreground>
             </TextBox>
 
-            <Label Content="It is not recommended to use a nickname that refers to your real data" HorizontalAlignment="Center" Margin="0,421,0,0" VerticalAlignment="Top" Foreground="White" FontSize="12" />
+            <Label Content="It is not recommended to use a username that refers to your real data" HorizontalAlignment="Center" Margin="0,421,0,0" VerticalAlignment="Top" Foreground="White" FontSize="12" />
         </Grid>
 
+        <Grid x:Name="clientConnectToServerGrid" Visibility="Visible">
+            <Label Content="Connecting to the Server" HorizontalAlignment="Center" Margin="0,153,0,0" VerticalAlignment="Top" Foreground="White" FontWeight="Bold" FontSize="20"/>
+            <ui:ProgressRing
+                Width="60"
+                Height="60"
+                IsActive="True"/>
+        </Grid>
+
+        <Grid x:Name="selectOrCreateRoomGrid" Visibility="Hidden">
+
+            <Grid x:Name="selectOrCreateRoomGridRoomNameGrid" Visibility="Hidden">
+
+                <ListBox x:Name="roomsListBox" Margin="156,51,156,244" SelectionChanged="RoomsListBox_SelectionChanged"/>
+                <Label Content="Choose room or enter the room name directly" HorizontalAlignment="Center" Margin="0,22,0,0" VerticalAlignment="Top" Foreground="White" FontSize="18" />
+
+                <Button Content="Continue" Margin="423,232,0,0" Click="ButtonContinue_Click" Width="121" Foreground="White" Background="#4776A8" VerticalAlignment="Top"/>
+                <TextBox HorizontalAlignment="Left" TextWrapping="Wrap" x:Name="textBoxRoomNameDirectly"
+              Text="{Binding TextBoxPreviewText, Mode=OneWay}" VerticalAlignment="Top" Width="262" 
+              Background="#273A4B" BorderBrush="#111920" Opacity="0.5"
+              GotFocus="TextBox_GotFocus" Margin="156,230,0,0" Height="36">
+
+                    <TextBox.Foreground>
+                        <SolidColorBrush Color="White"/>
+                    </TextBox.Foreground>
+                </TextBox>
+
+                <Label x:Name="inputCorrectRoomName" Content="Input a correct room name" HorizontalAlignment="Left" Margin="156,0,0,0" VerticalAlignment="Center" Foreground="#9C1824" FontSize="12" Height="36" Visibility="Hidden"/>
+
+                <Button Content="Back to choice" Margin="0,397,0,0" Click="ButtonBackToChoose_Click" Width="120" Foreground="White" Background="#2A4562" VerticalAlignment="Top" HorizontalAlignment="Center"/>
+            </Grid>
+
+            <Grid x:Name="selectOrCreateRoomGridPasswordGrid" Visibility="Hidden">
+
+                <Label Content="Enter room password" HorizontalAlignment="Center" Margin="0,152,0,0" VerticalAlignment="Top" Foreground="White" FontSize="18" />
+                <Label x:Name="labelRoomPasswordIncorrect" Content="Room password incorrect" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#9C1824" FontSize="12" Margin="0,15,0,0" Visibility="Hidden"/>
+                <Button Content="Join" Margin="0,245,0,0" VerticalAlignment="Top" Click="JoinButton_ClickAsync" Width="256" Foreground="White" Background="#4776A8" HorizontalAlignment="Center"/>
+                <TextBox HorizontalAlignment="Center" TextWrapping="Wrap" x:Name="textBoxRoomPassword"
+              Text="{Binding TextBoxPreviewText, Mode=OneWay}" VerticalAlignment="Top" Width="348" 
+              Background="#273A4B" BorderBrush="#111920" Opacity="0.5"
+              GotFocus="TextBox_GotFocus" Margin="0,191,0,0">
+
+                    <TextBox.Foreground>
+                        <SolidColorBrush Color="White"/>
+                    </TextBox.Foreground>
+                </TextBox>
+
+            </Grid>
+
+            <Grid x:Name="selectOrCreateRoomGridSelectGrid" Visibility="Hidden">
+                <Button Content="Join an existing room" Margin="94,208,0,0" VerticalAlignment="Top" Click="JoinChoosingButton_Click" Width="256" Foreground="White" Background="#4776A8"/>
+                <Button Content="Create your own room" Margin="355,208,0,0" VerticalAlignment="Top" Click="CreateChoosingButton_Click" Width="256" Foreground="White" Background="#4776A8"/>
+
+            </Grid>
+
+            <Grid x:Name="selectOrCreateRoomGridCreateGrid" Visibility="Hidden">
+
+
+                <Label x:Name="labelRoomNameIncorrect" Content="Room name is already in use, please enter another one" HorizontalAlignment="Center" VerticalAlignment="Top" Foreground="#9C1824" FontSize="12" Margin="0,350,0,0" Visibility="Hidden"/>
+
+                <Button Content="Create" Margin="0,286,0,0" VerticalAlignment="Top" Click="CreateButton_ClickAsync" Width="256" Foreground="White" Background="#4776A8" HorizontalAlignment="Center"/>
+
+                <Label Content="Enter room name" HorizontalAlignment="Center" Margin="0,113,0,0" VerticalAlignment="Top" Foreground="White" FontSize="18" />
+                <TextBox HorizontalAlignment="Center" TextWrapping="Wrap" x:Name="textBoxCreateRoomName"
+                    Text="{Binding TextBoxPreviewText, Mode=OneWay}" VerticalAlignment="Top" Width="348" 
+                    Background="#273A4B" BorderBrush="#111920" Opacity="0.5"
+                    GotFocus="TextBox_GotFocus" Margin="0,148,0,0" Foreground="White"/>
+
+                <Label Content="Enter room password" HorizontalAlignment="Center" Margin="0,196,0,0" VerticalAlignment="Top" Foreground="White" FontSize="18" />
+                <TextBox HorizontalAlignment="Center" TextWrapping="Wrap" x:Name="textBoxCreateRoomPassword"
+              Text="{Binding TextBoxPreviewText, Mode=OneWay}" VerticalAlignment="Top" Width="348" 
+              Background="#273A4B" BorderBrush="#111920" Opacity="0.5"
+              GotFocus="TextBox_GotFocus" Margin="0,231,0,0">
+
+                    <TextBox.Foreground>
+                        <SolidColorBrush Color="White"/>
+                    </TextBox.Foreground>
+                </TextBox>
+
+                <Button Content="Back to choice" Margin="0,397,0,0" Click="ButtonBackToChoose_Click" Width="120" Foreground="White" Background="#2A4562" VerticalAlignment="Top" HorizontalAlignment="Center"/>
+
+            </Grid>
+        </Grid>
 
     </Grid>
-
 
 </Window>

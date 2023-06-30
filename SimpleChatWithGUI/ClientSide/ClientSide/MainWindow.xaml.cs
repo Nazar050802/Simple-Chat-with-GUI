@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using ServerSide;
 
 namespace ClientSide
 {
@@ -23,40 +25,79 @@ namespace ClientSide
     public partial class MainWindow : Window
     {
         public string TextBoxPreviewText { get; set; } = "Type here...";
-        private List<(string userName, string message, bool senderOrReceiver)> chatMessages;
-        private DispatcherTimer messageTimer;
+
+
+        private DispatcherTimer messageTimer = new DispatcherTimer();
+        private DispatcherTimer connectionTimer = new DispatcherTimer();
+        private DispatcherTimer getRoomNamesTimer = new DispatcherTimer();
+
+        Controller controller;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            chatMessages = new List<(string userName, string message, bool senderOrReceiver)>();
-            messageTimer = new DispatcherTimer();
+            controller = new Controller();
+            controller.StartCommunicate();
 
             ShowMessages();
+            TryToConnectToTheServer();
+            UpdateRoomNames();
 
             DataContext = this;
+            roomsListBox.DataContext = controller;
+
+        }
+
+        private void TryToConnectToTheServer()
+        {
+            connectionTimer.Interval = TimeSpan.FromSeconds(1);
+            connectionTimer.Tick += TryToConnectToTheServer_Tick;
+            connectionTimer.Start();
+        }
+        private void TryToConnectToTheServer_Tick(object sender, EventArgs e)
+        {
+            if (controller.IsClientConnetToTheServer())
+            {
+                clientConnectToServerGrid.Visibility = Visibility.Hidden;
+                userDataGrid.Visibility = Visibility.Visible;
+                connectionTimer.Stop();
+                textBoxUsername.Text = "";
+            }
+        }
+
+        private void UpdateRoomNames()
+        {
+            getRoomNamesTimer.Interval = TimeSpan.FromSeconds(1);
+            getRoomNamesTimer.Tick += UpdateRoomNames_Tick;
+        }
+        private void UpdateRoomNames_Tick(object sender, EventArgs e)
+        {
+            _ = controller.UpdateRoomsNames();
+            roomsListBox.ItemsSource = controller.RoomsNames;
         }
 
         private void ShowMessages()
         {
-            messageTimer.Interval = TimeSpan.FromSeconds(1); 
+            messageTimer.Interval = TimeSpan.FromSeconds(1);
             messageTimer.Tick += MessageTimer_Tick;
             messageTimer.Start();
         }
 
         private void MessageTimer_Tick(object sender, EventArgs e)
         {
+            _ = controller.SetNewMessage();
+
             // Check for new messages in the Messages dictionary
-            foreach (var message in chatMessages)
+            foreach (var message in controller.GetNewMessages())
             {
-                string userNickname = message.userName;
-                string messageContent = message.message;
-                bool senderOrReceiver = message.senderOrReceiver;
+                string userNickname = message.Username;
+                string messageContent = message.Text;
+                bool senderOrReceiver = message.SenderOrReceiver;
                 AddMessageToChat(userNickname, messageContent, senderOrReceiver);
             }
 
-            chatMessages.Clear();
+            controller.VariableUpdateChatMessages();
         }
 
         private void AddMessageToChat(string userNickname, string message, bool senderOrReceiver)
@@ -115,14 +156,10 @@ namespace ClientSide
             ChatScrollViewer.ScrollToBottom();
         }
 
-        private void SendMessage(object sender, RoutedEventArgs e)
+        private async void SendMessageAsync(object sender, RoutedEventArgs e)
         {
-            chatMessages.Add(("User1111", MessageTextBox.Text, true));
-        }
-
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            chatMessages.Add(("User2", MessageTextBox.Text, false));
+            await controller.SendMessage($"{messageTextBox.Text}");
+            messageTextBox.Text = "";
         }
 
         private Color GeneratePastelColorFromString(string inputString)
@@ -159,13 +196,42 @@ namespace ClientSide
             return hash;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_ClickAsync(object sender, RoutedEventArgs e)
         {
-            chatGrid.Visibility = Visibility.Visible; 
+
+            string username = textBoxUsername.Text;
+            if (await controller.TryToSetUsername(username))
+            {
+                selectOrCreateRoomGrid.Visibility = Visibility.Visible;
+                selectOrCreateRoomGridSelectGrid.Visibility = Visibility.Visible;
+                userDataGrid.Visibility = Visibility.Hidden;
+
+                getRoomNamesTimer.Start();
+            }
+            else
+            {
+                labelUsernameAlreadyUse.Visibility = Visibility.Visible;
+            }
         }
+        private void ButtonContinue_Click(object sender, RoutedEventArgs e)
+        {
+
+            if (controller.RoomsNames.Contains(textBoxRoomNameDirectly.Text))
+            {
+                selectOrCreateRoomGridRoomNameGrid.Visibility = Visibility.Hidden;
+                selectOrCreateRoomGridPasswordGrid.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                inputCorrectRoomName.Visibility = Visibility.Visible;
+            }
+
+        }
+
 
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
+            // Change opacity of text in textBox
             TextBox tb = (TextBox)sender;
 
             if (tb.Text == TextBoxPreviewText)
@@ -176,5 +242,80 @@ namespace ClientSide
             tb.Opacity = 1;
         }
 
+        private void RoomsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string selectedItemName = roomsListBox.SelectedItem.ToString();
+
+            textBoxRoomNameDirectly.Focus();
+
+            textBoxRoomNameDirectly.Text = selectedItemName;
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            controller.CloseCommunication();
+        }
+
+        private async void JoinButton_ClickAsync(object sender, RoutedEventArgs e)
+        {
+            string roomName = textBoxRoomNameDirectly.Text;
+            string password = textBoxRoomPassword.Text;
+            if (await controller.TryToJoinRoom(roomName, password))
+            {
+                chatGrid.Visibility = Visibility.Visible;
+                selectOrCreateRoomGridPasswordGrid.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                labelRoomPasswordIncorrect.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void JoinChoosingButton_Click(object sender, RoutedEventArgs e)
+        {
+            selectOrCreateRoomGridSelectGrid.Visibility = Visibility.Hidden;
+
+            selectOrCreateRoomGridRoomNameGrid.Visibility = Visibility.Visible;
+        }
+
+        private void CreateChoosingButton_Click(object sender, RoutedEventArgs e)
+        {
+            selectOrCreateRoomGridSelectGrid.Visibility = Visibility.Hidden;
+
+            selectOrCreateRoomGridCreateGrid.Visibility = Visibility.Visible;
+        }
+        private async void CreateButton_ClickAsync(object sender, RoutedEventArgs e)
+        {
+            string roomName = textBoxCreateRoomName.Text;
+            string password = textBoxCreateRoomPassword.Text;
+            if (await controller.TryToCreateRoom(roomName, password))
+            {
+                chatGrid.Visibility = Visibility.Visible;
+                selectOrCreateRoomGridCreateGrid.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                labelUsernameAlreadyUse.Visibility = Visibility.Visible;
+            }
+        }
+
+
+        private void MyGrid_VisibilityChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (chatGrid.Visibility == Visibility.Visible)
+            {
+                controller.StartReceiveMessagesFromUsers();
+                textBlockRoomName.Text = controller.CurrentRoomName;
+                getRoomNamesTimer.Stop();
+            }
+        }
+
+        public void ButtonBackToChoose_Click(object sender, RoutedEventArgs e)
+        {
+            selectOrCreateRoomGridRoomNameGrid.Visibility = Visibility.Hidden;
+            selectOrCreateRoomGridCreateGrid.Visibility = Visibility.Hidden;
+
+            selectOrCreateRoomGridSelectGrid.Visibility = Visibility.Visible;
+        }
     }
 }

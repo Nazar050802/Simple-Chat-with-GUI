@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace ServerSide
 {
@@ -21,6 +22,10 @@ namespace ServerSide
         {
             clients = new ConcurrentBag<User>();
             rooms = new ConcurrentBag<Room>();
+
+            rooms.Add(new Room("test1", "123"));
+            rooms.Add(new Room("test2", "1234"));
+            rooms.Add(new Room("test3", "12345"));
         }
 
         public async Task HandleClientAsync(TcpClient client)
@@ -54,29 +59,76 @@ namespace ServerSide
         public async Task StartReceiveAndSendMessagesAsync(User user, InteractWithClient interactWithClient)
         {
             string message = await interactWithClient.ReceiveMessageWithEncryptionAsync();
-            while (message != "")
-            {
-                switch (message)
+            int counterForCloseConnection = 0;
+            while (message != Constants.ServerMessageCloseConnection)
+            {   
+                if(message == "")
                 {
-                    case Constants.ServerMessageGetListOfRooms:
-                        // User select or create room
-                        await SelectRoom(user, interactWithClient);
-
+                    counterForCloseConnection += 1;
+                    if (counterForCloseConnection > 100)
+                    {
                         break;
-
-                    case Constants.ServerMessageSendMessage:
-                        SimpleLogs.WriteToFile("[CommunicationWithClient.cs][INFO] " + $"Received from {user.Id}({user.Name}): {message}");
-
-                        // Broadcast the received message to all connected clients
-                        BroadcastMessage(message, user);
-
-                        break;
-
-                    default:
-                        break;
+                    }
                 }
 
+                // Style of getting message: [TYPE];special_info;other_info...
+                // Case: set username from user
+                if (message.StartsWith(Constants.ServerMessageSetName))
+                {
+                    await GetAndSetUsernameFromClient(message, user, interactWithClient);
+                }
+                // Case: send list of rooms
+                else if (message.StartsWith(Constants.ServerMessageGetListOfRooms))
+                {
+                    await SendRoomList(user, interactWithClient);
+                }
+                // Case: close connection
+                else if (message.StartsWith(Constants.ServerMessageCloseConnection))
+                {
+                    break;
+                }
+                // Case: join to room
+                else if (message.StartsWith(Constants.ServerMessageJoinToRoom))
+                {
+                    await JoinToRoom(user, interactWithClient, message);
+                }
+                // Case: create room
+                else if (message.StartsWith(Constants.ServerMessageCreateRoom))
+                {
+                    await CreateRoom(user, interactWithClient, message);
+                }
+                // Case: get message
+                else if (message.StartsWith(Constants.ServerMessageSendMessage))
+                {
+                    string[] elements = message.Split(';');
+                    string message_to_broadcast = string.Join("", elements.Skip(1));
+                    BroadcastMessage(message_to_broadcast, user);
+                }
+
+                SimpleLogs.WriteToFile("[CommunicationWithClient.cs][INFO] " + $"Received from {user.Id}({user.Name}): {message}");
                 message = await interactWithClient.ReceiveMessageWithEncryptionAsync();
+            }
+        }
+
+        public async Task GetAndSetUsernameFromClient(string message, User user, InteractWithClient interactWithClient)
+        {
+            string[] elements = message.Split(';');
+            string combinedString = string.Join("", elements.Skip(1));
+
+            string username = combinedString;
+            if (clients.Any(user => user.Name == username))
+            {
+                await interactWithClient.SendMessageWithEncryptionAsync(Constants.ServerMessageWrongName);
+            }
+            else
+            {
+                await interactWithClient.SendMessageWithEncryptionAsync(Constants.ServerMessageSuccessName);
+
+                User updatedUser = clients.FirstOrDefault(userToUpdate => userToUpdate.Id == user.Id);
+                if (updatedUser != null)
+                {
+                    updatedUser.Name = username;
+                }
             }
         }
 
@@ -90,9 +142,6 @@ namespace ServerSide
                 // Get client public key
                 user.rsaGeneratingClient.SetPublicKeyFromString(await interactWithClient.ReceiveMessageAsync());
                 interactWithClient.rsaGeneratingClient = user.rsaGeneratingClient;
-
-                // Get user username
-                user.Name = await interactWithClient.ReceiveMessageWithEncryptionAsync();
             }
             catch (Exception ex)
             {
@@ -102,7 +151,72 @@ namespace ServerSide
             return new Tuple<User, InteractWithClient>(user, interactWithClient);
         }
 
-        public async Task SelectRoom(User user, InteractWithClient interactWithClient)
+        public async Task SendRoomList(User user, InteractWithClient interactWithClient)
+        {
+            await interactWithClient.SendMessageWithEncryptionAsync($"{Constants.ServerMessageGetListOfRooms};{string.Join(";", rooms.Select(room => room.Name))}");
+        }
+
+        public async Task JoinToRoom(User user, InteractWithClient interactWithClient, string message)
+        {
+
+            // Delete user from current room
+            CloseRoom(user);
+
+            string[] elements = message.Split(';');
+
+            string roomName = elements[1];
+            string password = elements[2];
+
+            // Choose room
+            Room foundRoom = rooms.FirstOrDefault(room => room.Name == roomName);
+
+            if (foundRoom != null)
+            {
+                if (!foundRoom.ComparePassword(password))
+                {
+                    // Password incorrect send this information to user
+                    await interactWithClient.SendMessageWithEncryptionAsync(Constants.ServerMessageWrongRoomPassword);
+                }
+                else
+                {
+                    // Everything is correct send this information to user
+                    await interactWithClient.SendMessageWithEncryptionAsync(Constants.ServerMessageSuccessJoinToRoom);
+                    user.CurrentRoomName = foundRoom.Name;
+                    foundRoom.UsersInRoom.Add(user.Id);
+                }
+            }
+        }
+
+        public async Task CreateRoom(User user, InteractWithClient interactWithClient, string message)
+        {
+
+            string[] elements = message.Split(';');
+
+            string roomName = elements[1];
+            string password = elements[2];
+
+            // Create room
+            Room foundRoom = rooms.FirstOrDefault(room => room.Name == roomName);
+
+            if (foundRoom != null)
+            {
+                // Room already exist send wrong message
+                await interactWithClient.SendMessageWithEncryptionAsync(Constants.ServerMessageWrongCreateRoom);
+            }
+            else
+            {
+                // Create room using the login and password
+                Room createRoom = new Room(roomName, password);
+                user.CurrentRoomName = createRoom.Name;
+                createRoom.UsersInRoom.Add(user.Id);
+
+                rooms.Add(createRoom);
+
+                await interactWithClient.SendMessageWithEncryptionAsync(Constants.ServerMessageSuccessCreateRoom);
+            }
+        }
+
+            public async Task SelectRoom(User user, InteractWithClient interactWithClient)
         {
             // Send room list
             await interactWithClient.SendMessageWithEncryptionAsync(string.Join(",", rooms.Select(room => room.Name)));
@@ -139,8 +253,6 @@ namespace ServerSide
                 rooms.Add(createRoom);
             }
 
-            // Send message that everything was success
-            await interactWithClient.SendMessageWithEncryptionAsync(Constants.ServerMessageSuccessJoinToRoom);
         }
 
         public void BroadcastMessage(string message, User currentUser)
@@ -161,7 +273,7 @@ namespace ServerSide
                     if (user.Id != currentUser.Id)
                     {
                         InteractWithClient interactWithClient = new InteractWithClient(user.TcpConnection, user.rsaGeneratingClient, user.rsaGeneratingServer);
-                        _ = interactWithClient.SendMessageWithEncryptionAsync(message);
+                        _ = interactWithClient.SendMessageWithEncryptionAsync($"{Constants.ServerMessageGetMessage};{currentUser.Name};{message}");
                     }
                 }
             }

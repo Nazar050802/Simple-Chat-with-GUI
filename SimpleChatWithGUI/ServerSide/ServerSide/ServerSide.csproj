@@ -8,11 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ModernWpfUI" Version="0.9.6" />
+    <Folder Include="Backend\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Backend\" />
+    <PackageReference Include="ModernWpfUI" Version="0.9.6" />
   </ItemGroup>
 
 </Project>

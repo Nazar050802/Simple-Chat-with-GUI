@@ -63,18 +63,24 @@ namespace ServerSide
 
         private void ReadAndDisplayLog()
         {
-            // Read the log file contents
-            string logText = File.ReadAllText(controller.LogFileName);
-
-            // Update the textbox text on the UI thread
-            Dispatcher.Invoke(() =>
+            try
             {
-                logTextBox.Text = logText;
-                logTextBox.ScrollToEnd();
-            });
+                // Read the log file contents
+                string logText = File.ReadAllText(controller.LogFileName);
 
-            // Update the last modified time
-            lastModifiedTime = File.GetLastWriteTime(controller.LogFileName);
+                // Update the textbox text on the UI thread
+                Dispatcher.Invoke(() =>
+                {
+                    logTextBox.Text = logText;
+                    logTextBox.ScrollToEnd();
+                });
+
+                // Update the last modified time
+                lastModifiedTime = File.GetLastWriteTime(controller.LogFileName);
+            }
+            catch (Exception ex) {
+                
+            }
         }
 
         private void Button_Click_Start_Server(object sender, RoutedEventArgs e)
