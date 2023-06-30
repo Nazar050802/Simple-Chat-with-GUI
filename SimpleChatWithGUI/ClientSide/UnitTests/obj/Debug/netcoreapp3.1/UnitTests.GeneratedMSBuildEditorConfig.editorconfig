@@ -1,0 +1,3 @@
+is_global = true
+build_property.RootNamespace = UnitTests
+build_property.ProjectDir = D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ClientSide\UnitTests\

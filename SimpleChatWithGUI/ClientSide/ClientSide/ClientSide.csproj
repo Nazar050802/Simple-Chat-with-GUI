@@ -9,10 +9,12 @@
 
   <ItemGroup>
     <Folder Include="Backend\" />
+    <Folder Include="Tests\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="ModernWpfUI" Version="0.9.6" />
+    <PackageReference Include="NUnit" Version="3.13.3" />
   </ItemGroup>
 
 </Project>

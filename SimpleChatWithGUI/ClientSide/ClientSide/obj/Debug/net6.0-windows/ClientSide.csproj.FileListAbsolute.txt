@@ -149,3 +149,4 @@ D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ClientSide\ClientSi
 D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ClientSide\ClientSide\bin\Debug\net6.0-windows\vi-VN\ModernWpf.resources.dll
 D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ClientSide\ClientSide\obj\Debug\net6.0-windows\App.baml
 D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ClientSide\ClientSide\obj\Debug\net6.0-windows\ClientSide.csproj.CopyComplete
+D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ClientSide\ClientSide\bin\Debug\net6.0-windows\nunit.framework.dll

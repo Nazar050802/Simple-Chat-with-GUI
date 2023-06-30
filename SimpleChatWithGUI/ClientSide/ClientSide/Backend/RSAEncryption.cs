@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ServerSide
 {
-    internal class RSAGenerating
+    public class RSAGenerating
     {
 
         public string PublicKey { get; protected set; }
