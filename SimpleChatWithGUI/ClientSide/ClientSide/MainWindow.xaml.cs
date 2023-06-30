@@ -156,12 +156,6 @@ namespace ClientSide
             ChatScrollViewer.ScrollToBottom();
         }
 
-        private async void SendMessageAsync(object sender, RoutedEventArgs e)
-        {
-            await controller.SendMessage($"{messageTextBox.Text}");
-            messageTextBox.Text = "";
-        }
-
         private Color GeneratePastelColorFromString(string inputString)
         {
             // Get hash from string
@@ -196,39 +190,6 @@ namespace ClientSide
             return hash;
         }
 
-        private async void Button_ClickAsync(object sender, RoutedEventArgs e)
-        {
-
-            string username = textBoxUsername.Text;
-            if (await controller.TryToSetUsername(username))
-            {
-                selectOrCreateRoomGrid.Visibility = Visibility.Visible;
-                selectOrCreateRoomGridSelectGrid.Visibility = Visibility.Visible;
-                userDataGrid.Visibility = Visibility.Hidden;
-
-                getRoomNamesTimer.Start();
-            }
-            else
-            {
-                labelUsernameAlreadyUse.Visibility = Visibility.Visible;
-            }
-        }
-        private void ButtonContinue_Click(object sender, RoutedEventArgs e)
-        {
-
-            if (controller.RoomsNames.Contains(textBoxRoomNameDirectly.Text))
-            {
-                selectOrCreateRoomGridRoomNameGrid.Visibility = Visibility.Hidden;
-                selectOrCreateRoomGridPasswordGrid.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                inputCorrectRoomName.Visibility = Visibility.Visible;
-            }
-
-        }
-
-
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
             // Change opacity of text in textBox
@@ -251,23 +212,65 @@ namespace ClientSide
             textBoxRoomNameDirectly.Text = selectedItemName;
         }
 
-        private void Window_Closed(object sender, EventArgs e)
+        private async void SendMessageAsync(object sender, RoutedEventArgs e)
         {
-            controller.CloseCommunication();
+            if (!string.IsNullOrWhiteSpace(messageTextBox.Text))
+            {
+                await controller.SendMessage($"{messageTextBox.Text}");
+                messageTextBox.Text = "";
+            }
+        }
+
+        private async void Button_ClickAsync(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(textBoxUsername.Text))
+            {
+                string username = textBoxUsername.Text;
+                if (await controller.TryToSetUsername(username))
+                {
+                    selectOrCreateRoomGrid.Visibility = Visibility.Visible;
+                    selectOrCreateRoomGridSelectGrid.Visibility = Visibility.Visible;
+                    userDataGrid.Visibility = Visibility.Hidden;
+
+                    getRoomNamesTimer.Start();
+                }
+                else
+                {
+                    labelUsernameAlreadyUse.Visibility = Visibility.Visible;
+                }
+            }
+        }
+        private void ButtonContinue_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(textBoxRoomNameDirectly.Text))
+            {
+                if (controller.RoomsNames.Contains(textBoxRoomNameDirectly.Text))
+                {
+                    selectOrCreateRoomGridRoomNameGrid.Visibility = Visibility.Hidden;
+                    selectOrCreateRoomGridPasswordGrid.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    inputCorrectRoomName.Visibility = Visibility.Visible;
+                }
+            }
         }
 
         private async void JoinButton_ClickAsync(object sender, RoutedEventArgs e)
         {
-            string roomName = textBoxRoomNameDirectly.Text;
-            string password = textBoxRoomPassword.Text;
-            if (await controller.TryToJoinRoom(roomName, password))
+            if (!string.IsNullOrWhiteSpace(textBoxRoomNameDirectly.Text) && !string.IsNullOrWhiteSpace(textBoxRoomPassword.Text))
             {
-                chatGrid.Visibility = Visibility.Visible;
-                selectOrCreateRoomGridPasswordGrid.Visibility = Visibility.Hidden;
-            }
-            else
-            {
-                labelRoomPasswordIncorrect.Visibility = Visibility.Visible;
+                string roomName = textBoxRoomNameDirectly.Text;
+                string password = textBoxRoomPassword.Text;
+                if (await controller.TryToJoinRoom(roomName, password))
+                {
+                    chatGrid.Visibility = Visibility.Visible;
+                    selectOrCreateRoomGridPasswordGrid.Visibility = Visibility.Hidden;
+                }
+                else
+                {
+                    labelRoomPasswordIncorrect.Visibility = Visibility.Visible;
+                }
             }
         }
 
@@ -286,19 +289,21 @@ namespace ClientSide
         }
         private async void CreateButton_ClickAsync(object sender, RoutedEventArgs e)
         {
-            string roomName = textBoxCreateRoomName.Text;
-            string password = textBoxCreateRoomPassword.Text;
-            if (await controller.TryToCreateRoom(roomName, password))
+            if (!string.IsNullOrWhiteSpace(textBoxCreateRoomName.Text) && !string.IsNullOrWhiteSpace(textBoxCreateRoomPassword.Text))
             {
-                chatGrid.Visibility = Visibility.Visible;
-                selectOrCreateRoomGridCreateGrid.Visibility = Visibility.Hidden;
-            }
-            else
-            {
-                labelUsernameAlreadyUse.Visibility = Visibility.Visible;
+                string roomName = textBoxCreateRoomName.Text;
+                string password = textBoxCreateRoomPassword.Text;
+                if (await controller.TryToCreateRoom(roomName, password))
+                {
+                    chatGrid.Visibility = Visibility.Visible;
+                    selectOrCreateRoomGridCreateGrid.Visibility = Visibility.Hidden;
+                }
+                else
+                {
+                    labelUsernameAlreadyUse.Visibility = Visibility.Visible;
+                }
             }
         }
-
 
         private void MyGrid_VisibilityChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
@@ -316,6 +321,11 @@ namespace ClientSide
             selectOrCreateRoomGridCreateGrid.Visibility = Visibility.Hidden;
 
             selectOrCreateRoomGridSelectGrid.Visibility = Visibility.Visible;
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            controller.CloseCommunication();
         }
     }
 }

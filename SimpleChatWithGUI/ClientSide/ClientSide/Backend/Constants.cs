@@ -48,7 +48,5 @@ namespace ServerSide
 
         public const string ServerMessageCloseConnection = "[CLOSE_CONNECTION]";
 
-        string allServerMessages = string.Join(";", ServerMessageSendMessage, ServerMessageGetMessage, ServerMessageSetName, ServerMessageWrongName, ServerMessageSuccessName, ServerMessageGetListOfRooms, ServerMessageJoinToRoom, ServerMessageSuccessJoinToRoom, ServerMessageWrongRoomPassword, ServerMessageCreateRoom, ServerMessageSuccessCreateRoom, ServerMessageWrongCreateRoom, ServerMessageCloseConnection);
-
     }
 }

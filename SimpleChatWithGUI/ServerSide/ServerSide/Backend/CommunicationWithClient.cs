@@ -22,10 +22,6 @@ namespace ServerSide
         {
             clients = new ConcurrentBag<User>();
             rooms = new ConcurrentBag<Room>();
-
-            rooms.Add(new Room("test1", "123"));
-            rooms.Add(new Room("test2", "1234"));
-            rooms.Add(new Room("test3", "12345"));
         }
 
         public async Task HandleClientAsync(TcpClient client)
@@ -64,6 +60,7 @@ namespace ServerSide
             {   
                 if(message == "")
                 {
+                    // Emergency close the client if an error occurs
                     counterForCloseConnection += 1;
                     if (counterForCloseConnection > 100)
                     {
@@ -214,45 +211,6 @@ namespace ServerSide
 
                 await interactWithClient.SendMessageWithEncryptionAsync(Constants.ServerMessageSuccessCreateRoom);
             }
-        }
-
-            public async Task SelectRoom(User user, InteractWithClient interactWithClient)
-        {
-            // Send room list
-            await interactWithClient.SendMessageWithEncryptionAsync(string.Join(",", rooms.Select(room => room.Name)));
-
-            // Delete user from current room
-            CloseRoom(user);
-
-            // Choose or create room
-            string[] choosenRoomNameAndPassword = (await interactWithClient.ReceiveMessageWithEncryptionAsync()).Split(',');
-            Room foundRoom = rooms.FirstOrDefault(room => room.Name == choosenRoomNameAndPassword[0]);
-
-            string password = choosenRoomNameAndPassword[1];
-            if (foundRoom != null)
-            {
-                while (!foundRoom.ComparePassword(password))
-                {
-                    // Send message that password is wrong
-                    await interactWithClient.SendMessageWithEncryptionAsync(Constants.ServerMessageWrongRoomPassword);
-
-                    // Get new data
-                    password = (await interactWithClient.ReceiveMessageWithEncryptionAsync()).Split(',')[1];
-                }
-
-                user.CurrentRoomName = foundRoom.Name;
-                foundRoom.UsersInRoom.Add(user.Id);
-            }
-            else
-            {
-                // Create room using the login and password
-                Room createRoom = new Room(choosenRoomNameAndPassword[0], choosenRoomNameAndPassword[1]);
-                user.CurrentRoomName = createRoom.Name;
-                createRoom.UsersInRoom.Add(user.Id);
-
-                rooms.Add(createRoom);
-            }
-
         }
 
         public void BroadcastMessage(string message, User currentUser)
