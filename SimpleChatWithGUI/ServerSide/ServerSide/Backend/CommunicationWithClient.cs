@@ -98,7 +98,7 @@ namespace ServerSide
                 else if (message.StartsWith(Constants.ServerMessageSendMessage))
                 {
                     string[] elements = message.Split(';');
-                    string message_to_broadcast = string.Join("", elements.Skip(1));
+                    string message_to_broadcast = string.Join(";", elements.Skip(1));
                     BroadcastMessage(message_to_broadcast, user);
                 }
 
@@ -156,14 +156,17 @@ namespace ServerSide
         public async Task JoinToRoom(User user, InteractWithClient interactWithClient, string message)
         {
 
-            // Delete user from current room
-            CloseRoom(user);
-
             string[] elements = message.Split(';');
 
             string roomName = elements[1];
             string password = elements[2];
 
+            // Delete user from current room only if it's attempt another room
+            if (user.CurrentRoomName != roomName)
+            {
+                CloseRoom(user);
+            }
+ 
             // Choose room
             Room foundRoom = rooms.FirstOrDefault(room => room.Name == roomName);
 

@@ -1,0 +1,86 @@
+[02/07/2023 19:20:34] Log file was created
+[02/07/2023 19:21:31] [CommunicationWithClient.cs][ERROR] System.IO.IOException: Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host..
+ ---> System.Net.Sockets.SocketException (10054): An existing connection was forcibly closed by the remote host.
+   --- End of inner exception stack trace ---
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource<System.Int32>.GetResult(Int16 token)
+   at System.Threading.Tasks.ValueTask`1.ValueTaskSourceAsTask.<>c.<.cctor>b__4_0(Object state)
+--- End of stack trace from previous location ---
+   at ClientSide.InteractWithServer.ReceiveMessageWithEncryptionAsync() in D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ClientSide\ClientSide\Backend\CommunicationWithServer.cs:line 243
+[02/07/2023 19:21:36] [CommunicationWithClient.cs][ERROR] System.IO.IOException: Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host..
+ ---> System.Net.Sockets.SocketException (10054): An existing connection was forcibly closed by the remote host.
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.CreateException(SocketError error, Boolean forAsyncThrow)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ReceiveAsync(Socket socket, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.ReceiveAsync(Memory`1 buffer, SocketFlags socketFlags, Boolean fromNetworkStream, CancellationToken cancellationToken)
+   at System.Net.Sockets.NetworkStream.ReadAsync(Byte[] buffer, Int32 offset, Int32 count, CancellationToken cancellationToken)
+   at System.IO.Stream.ReadAsync(Byte[] buffer, Int32 offset, Int32 count)
+   at ClientSide.InteractWithServer.ReceiveMessageWithEncryptionAsync() in D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ClientSide\ClientSide\Backend\CommunicationWithServer.cs:line 243
+   at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine& stateMachine)
+   at ClientSide.InteractWithServer.ReceiveMessageWithEncryptionAsync()
+   at ClientSide.CommunicationWithServer.ReceiveMessagesAsync(CancellationToken cancellationToken) in D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ClientSide\ClientSide\Backend\CommunicationWithServer.cs:line 167
+   at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine& stateMachine)
+   at ClientSide.CommunicationWithServer.ReceiveMessagesAsync(CancellationToken cancellationToken)
+   at ClientSide.CommunicationWithServer.<StartToReveiveMessages>b__21_0() in D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ClientSide\ClientSide\Backend\CommunicationWithServer.cs:line 87
+   at System.Threading.Tasks.Task`1.InnerInvoke()
+   at System.Threading.Tasks.Task.<>c.<.cctor>b__272_0(Object obj)
+   at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+   at System.Threading.Tasks.Task.ExecuteEntryUnsafe(Thread threadPoolThread)
+   at System.Threading.Tasks.Task.ExecuteFromThreadPool(Thread threadPoolThread)
+   at System.Threading.ThreadPoolWorkQueue.Dispatch()
+   at System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()
+   at System.Threading.Thread.StartCallback()
+--- End of stack trace from previous location ---
+
+   --- End of inner exception stack trace ---
+   at ClientSide.InteractWithServer.ReceiveMessageWithEncryptionAsync() in D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ClientSide\ClientSide\Backend\CommunicationWithServer.cs:line 243
+[02/07/2023 19:21:36] [CommunicationWithClient.cs][ERROR] System.IO.IOException: Unable to write data to the transport connection: An existing connection was forcibly closed by the remote host..
+ ---> System.Net.Sockets.SocketException (10054): An existing connection was forcibly closed by the remote host.
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.CreateException(SocketError error, Boolean forAsyncThrow)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.SendAsyncForNetworkStream(Socket socket, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.SendAsyncForNetworkStream(ReadOnlyMemory`1 buffer, SocketFlags socketFlags, CancellationToken cancellationToken)
+   at System.Net.Sockets.NetworkStream.WriteAsync(Byte[] buffer, Int32 offset, Int32 count, CancellationToken cancellationToken)
+   at System.IO.Stream.WriteAsync(Byte[] buffer, Int32 offset, Int32 count)
+   at ClientSide.InteractWithServer.SendMessageWithEncryptionAsync(String message) in D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ClientSide\ClientSide\Backend\CommunicationWithServer.cs:line 282
+   at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine& stateMachine)
+   at ClientSide.InteractWithServer.SendMessageWithEncryptionAsync(String message)
+   at ClientSide.CommunicationWithServer.SendToServerMessageAboutClosingConnection() in D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ClientSide\ClientSide\Backend\CommunicationWithServer.cs:line 208
+   at System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start[TStateMachine](TStateMachine& stateMachine)
+   at ClientSide.CommunicationWithServer.SendToServerMessageAboutClosingConnection()
+   at ClientSide.Controller.CloseCommunication() in D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ClientSide\ClientSide\Controller\Controller.cs:line 130
+   at ClientSide.MainWindow.Window_Closed(Object sender, EventArgs e) in D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ClientSide\ClientSide\MainWindow.xaml.cs:line 328
+   at System.Windows.Window.OnClosed(EventArgs e)
+   at System.Windows.Window.WmDestroy()
+   at System.Windows.Window.WindowFilterMessage(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at System.Windows.Interop.HwndSource.PublicHooksFilterMessage(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at MS.Win32.HwndWrapper.WndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam, Boolean& handled)
+   at MS.Win32.HwndSubclass.DispatcherCallbackOperation(Object o)
+   at System.Windows.Threading.ExceptionWrapper.InternalRealCall(Delegate callback, Object args, Int32 numArgs)
+   at System.Windows.Threading.ExceptionWrapper.TryCatchWhen(Object source, Delegate callback, Object args, Int32 numArgs, Delegate catchHandler)
+   at System.Windows.Threading.Dispatcher.LegacyInvokeImpl(DispatcherPriority priority, TimeSpan timeout, Delegate method, Object args, Int32 numArgs)
+   at MS.Win32.HwndSubclass.SubclassWndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam)
+   at MS.Win32.UnsafeNativeMethods.CallWindowProc(IntPtr wndProc, IntPtr hWnd, Int32 msg, IntPtr wParam, IntPtr lParam)
+   at MS.Win32.UnsafeNativeMethods.CallWindowProc(IntPtr wndProc, IntPtr hWnd, Int32 msg, IntPtr wParam, IntPtr lParam)
+   at MS.Win32.HwndSubclass.DefWndProcWrapper(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam)
+   at MS.Win32.UnsafeNativeMethods.CallWindowProc(IntPtr wndProc, IntPtr hWnd, Int32 msg, IntPtr wParam, IntPtr lParam)
+   at MS.Win32.UnsafeNativeMethods.CallWindowProc(IntPtr wndProc, IntPtr hWnd, Int32 msg, IntPtr wParam, IntPtr lParam)
+   at MS.Win32.HwndSubclass.SubclassWndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam)
+   at MS.Win32.UnsafeNativeMethods.CallWindowProc(IntPtr wndProc, IntPtr hWnd, Int32 msg, IntPtr wParam, IntPtr lParam)
+   at MS.Win32.UnsafeNativeMethods.CallWindowProc(IntPtr wndProc, IntPtr hWnd, Int32 msg, IntPtr wParam, IntPtr lParam)
+   at MS.Win32.HwndSubclass.DefWndProcWrapper(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam)
+   at MS.Win32.UnsafeNativeMethods.CallWindowProc(IntPtr wndProc, IntPtr hWnd, Int32 msg, IntPtr wParam, IntPtr lParam)
+   at MS.Win32.UnsafeNativeMethods.CallWindowProc(IntPtr wndProc, IntPtr hWnd, Int32 msg, IntPtr wParam, IntPtr lParam)
+   at MS.Win32.HwndSubclass.SubclassWndProc(IntPtr hwnd, Int32 msg, IntPtr wParam, IntPtr lParam)
+   at MS.Win32.UnsafeNativeMethods.DispatchMessage(MSG& msg)
+   at MS.Win32.UnsafeNativeMethods.DispatchMessage(MSG& msg)
+   at System.Windows.Threading.Dispatcher.PushFrameImpl(DispatcherFrame frame)
+   at System.Windows.Threading.Dispatcher.PushFrame(DispatcherFrame frame)
+   at System.Windows.Threading.Dispatcher.Run()
+   at System.Windows.Application.RunDispatcher(Object ignore)
+   at System.Windows.Application.RunInternal(Window window)
+   at System.Windows.Application.Run()
+   at ClientSide.App.Main()
+--- End of stack trace from previous location ---
+
+   --- End of inner exception stack trace ---
+   at ClientSide.InteractWithServer.SendMessageWithEncryptionAsync(String message) in D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ClientSide\ClientSide\Backend\CommunicationWithServer.cs:line 282

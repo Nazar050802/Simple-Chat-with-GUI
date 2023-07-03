@@ -15,13 +15,13 @@ using System.Threading.Tasks;
 
 namespace ClientSide
 {
-    internal class CommunicationWithServer
+    public class CommunicationWithServer
     {
         private TcpClient Client { get; set; }
         private CancellationTokenSource cancellationTokenSource;
         private BasicClient BasicClientInfo { get; set; }
 
-        private InteractWithServer interactWithServer;
+        public InteractWithServer interactWithServer;
 
         public bool EstablishedConnection { get; set; }
 
@@ -59,7 +59,7 @@ namespace ClientSide
             }
 
             EstablishedConnection = true;
-            interactWithServer = new InteractWithServer(Client, new RSAGenerating(), new RSAGenerating());
+            interactWithServer = new InteractWithServer(Client.GetStream(), new RSAGenerating(), new RSAGenerating());
         }
 
         public async Task InitialSetting()
@@ -115,7 +115,7 @@ namespace ClientSide
         public void GetMessageFromAnotherClient(string message)
         {
             string[] elements = message.Split(';');
-            string combinedString = string.Join("", elements.Skip(2));
+            string combinedString = string.Join(";", elements.Skip(2));
 
             chatMessages.Add(new Message(elements[1], combinedString, true));
         }
@@ -215,7 +215,7 @@ namespace ClientSide
 
     }
 
-    class InteractWithServer
+    public class InteractWithServer
     {
         private NetworkStream Stream { get; set; }
 
@@ -223,10 +223,9 @@ namespace ClientSide
 
         public RSAGenerating rsaGeneratingClient;
 
-        public InteractWithServer(TcpClient client, RSAGenerating rsaClient, RSAGenerating rsaServer)
+        public InteractWithServer(NetworkStream stream, RSAGenerating rsaClient, RSAGenerating rsaServer)
         {
-            Stream = client.GetStream();
-
+            Stream = stream;
             rsaGeneratingClient = rsaClient;
             rsaGeneratingServer = rsaServer;
         }

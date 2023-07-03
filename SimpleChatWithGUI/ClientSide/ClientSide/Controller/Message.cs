@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ClientSide
 {
-    class Message
+    public class Message
     {
         public string Id { get; set; }
 

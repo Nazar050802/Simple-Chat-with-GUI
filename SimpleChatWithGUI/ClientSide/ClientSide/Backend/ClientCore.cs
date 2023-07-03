@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ClientSide
 {
-    internal class ClientCore
+    public class ClientCore
     {
         public CommunicationWithServer communicationWithServer;
 

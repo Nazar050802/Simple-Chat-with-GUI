@@ -29,12 +29,12 @@ namespace ServerSide
         }
     }
 
-    internal class BasicInfoIpAddress
+    public class BasicInfoIpAddress
     {
         private bool DebugMode { get; set; }
         private IIpAdressProvider IpAddressString { get; set; }
 
-        public int Port { get; private set; }
+        public virtual int Port { get; private set; }
 
         public BasicInfoIpAddress(bool debugMode, string ipAddressString = Constants.DefaultIP, int port = Constants.DefaultPort)
         {
@@ -50,7 +50,7 @@ namespace ServerSide
             return new IPEndPoint(IpAddressString.GetIPAddress(), Port);
         }
 
-        public IPAddress GetIPAddress()
+        public virtual IPAddress GetIPAddress()
         {
             return IpAddressString.GetIPAddress();
         }

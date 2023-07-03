@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ServerSide
 {
-    internal class Constants
+    public class Constants
     {
         public const int EncryptSizeBytes = 128;
 

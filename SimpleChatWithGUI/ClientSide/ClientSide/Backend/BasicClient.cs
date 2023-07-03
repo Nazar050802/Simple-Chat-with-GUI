@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ServerSide
 {
-    internal class BasicClient
+    public class BasicClient
     {
         public IPAddress IpAddress { get; private set; }
         public int Port { get; private set; }  
