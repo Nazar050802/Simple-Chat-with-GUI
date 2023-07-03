@@ -30,7 +30,7 @@ namespace ClientSide
             SimpleLogs.CreateLogFile();
 
             // Get ip address in debug mode without global ip address
-            BasicInfoIpAddress ipAddress = new BasicInfoIpAddress(true);
+            BasicInfoIpAddress ipAddress = new BasicInfoIpAddress(true, Constants.DefaultIP, Constants.DefaultPort);
 
             BasicClient basicClient = new BasicClient(ipAddress);
             TcpClient client = basicClient.GetTcpClient();

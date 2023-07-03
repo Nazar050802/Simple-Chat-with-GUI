@@ -15,7 +15,7 @@ namespace ServerSide
 
         private BasicInfoIpAddress ipAddress;
 
-        public ServerCore(string ip, int port) {
+        public ServerCore(string ip=Constants.DefaultIP, int port=Constants.DefaultPort) {
             communicationWithClient = new CommunicationWithClient();
             LogFileName = "";
 

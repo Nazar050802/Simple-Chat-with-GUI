@@ -7,8 +7,9 @@
         xmlns:ui="http://schemas.modernwpf.com/2019"
         ui:WindowHelper.UseModernWindowStyle="True"
         mc:Ignorable="d"
+        ResizeMode="NoResize"
         Title="MainWindow" Height="459" Width="800">
-    
+
     <Grid>
         <TextBox x:Name="logTextBox" VerticalScrollBarVisibility="Auto" IsReadOnly="True" Margin="43,31,43,0" TextWrapping="Wrap" Text="LogInformationHere" VerticalAlignment="Top" Height="315"/>
         <TextBox x:Name="ipTextBox" HorizontalAlignment="Left" Margin="43,382,0,0" TextWrapping="Wrap" Text="127.0.0.1" VerticalAlignment="Top" Width="156" />

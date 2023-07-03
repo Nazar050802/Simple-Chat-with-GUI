@@ -12,6 +12,14 @@
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen">
 
+    <Window.Resources>
+        <ResourceDictionary>
+            <Style TargetType="Window">
+                <Setter Property="Background" Value="Black" />
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+
     <Grid Background="#0E1721">
 
         <Grid x:Name="chatGrid" Visibility="Hidden" IsVisibleChanged="MyGrid_VisibilityChanged">
