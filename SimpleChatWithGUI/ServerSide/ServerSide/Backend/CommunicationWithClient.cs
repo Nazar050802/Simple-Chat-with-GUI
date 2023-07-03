@@ -13,7 +13,7 @@ using System.Xml.Linq;
 
 namespace ServerSide
 {
-    internal class CommunicationWithClient
+    public class CommunicationWithClient
     {
         private ConcurrentBag<User> clients;
         private ConcurrentBag<Room> rooms;
@@ -22,6 +22,16 @@ namespace ServerSide
         {
             clients = new ConcurrentBag<User>();
             rooms = new ConcurrentBag<Room>();
+        }
+
+        public ConcurrentBag<User> GetClients()
+        {
+            return clients;
+        }
+
+        public ConcurrentBag<Room> GetRooms()
+        {
+            return rooms;
         }
 
         public async Task HandleClientAsync(TcpClient client)
@@ -312,7 +322,7 @@ namespace ServerSide
         }
     }
 
-    class InteractWithClient
+    public class InteractWithClient
     {
         private NetworkStream Stream { get; set; }
 

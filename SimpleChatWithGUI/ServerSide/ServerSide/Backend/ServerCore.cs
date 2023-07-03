@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ServerSide
 {
-    internal class ServerCore
+    public class ServerCore
     {
         public CommunicationWithClient communicationWithClient;
         public string LogFileName { get; set; }
@@ -29,7 +29,7 @@ namespace ServerSide
             SimpleLogs.CreateLogFile();
 
             // Set log fileName
-            LogFileName = SimpleLogs.fileName;
+            LogFileName = SimpleLogs.FileName;
 
             // Initialize listener
             BasicListener sListener = new BasicListener(ipAddress);

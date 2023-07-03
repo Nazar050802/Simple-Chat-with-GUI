@@ -29,7 +29,7 @@ namespace ServerSide
         }
     }
 
-    internal class BasicInfoIpAddress
+    public class BasicInfoIpAddress
     {
         private bool DebugMode { get; set; }
         private IIpAdressProvider IpAddressString { get; set;}

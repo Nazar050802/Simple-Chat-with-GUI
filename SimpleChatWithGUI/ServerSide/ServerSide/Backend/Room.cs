@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ServerSide
 {
-    internal class Room
+    public class Room
     {
         public string Name { get; set; }
 

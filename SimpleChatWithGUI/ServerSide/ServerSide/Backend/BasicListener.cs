@@ -21,8 +21,8 @@ namespace ServerSide
             return new Socket(addressFamily, socketType, protocolType);
         }
     }
-    
-    internal class BasicListener
+
+    public class BasicListener
     {
         private IPEndPoint IpEndPoint { get; set; }
         private IPAddress IpAddress { get; set; }

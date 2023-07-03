@@ -2,25 +2,26 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ServerSide
 {
-    internal static class SimpleLogs
+    public static class SimpleLogs
     {
-        public static string fileName = $"log_{DateTime.Now.ToString("dd_MM_yyyy_HH_mm_ss")}.txt";
-        private static string pathToFile = Path.Combine(Environment.CurrentDirectory, fileName);
+        public static string FileName { get; set; } = $"log_{DateTime.Now.ToString("dd_MM_yyyy_HH_mm_ss")}.txt";
+        private static string PathToFile { get; set; } = Path.Combine(Environment.CurrentDirectory, FileName);
 
-        public static bool CreateLogFile()
+        public static bool CreateLogFile(string pathToFile = "")
         {
+            string finalPathFile = pathToFile == "" ? PathToFile : pathToFile;
+
             try
             {
                 // Create log file if not exist
-                if (!File.Exists(pathToFile))
+                if (!File.Exists(finalPathFile))
                 {
-                    FileStream fs = File.Create(pathToFile);
+                    FileStream fs = File.Create(finalPathFile);
                     fs.Close();
 
                     WriteToFile("Log file was created");
@@ -34,11 +35,11 @@ namespace ServerSide
             return true;
         }
 
-        public static bool WriteToFile(string textToWrite)
+        public static bool WriteToFile(string textToWrite, string pathToFile = "")
         {
             try
             {
-                using (StreamWriter wr = File.AppendText(pathToFile))
+                using (StreamWriter wr = File.AppendText(pathToFile == "" ? PathToFile : pathToFile))
                 {
                     // Add text to file
                     wr.WriteLine($"[{DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")}] {textToWrite}");
