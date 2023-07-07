@@ -10,10 +10,10 @@ namespace ServerSide
 {
     public class ServerCore
     {
-        public CommunicationWithClient communicationWithClient;
+        public CommunicationWithClient communicationWithClient { get; set; }
         public string LogFileName { get; set; }
 
-        private BasicInfoIpAddress ipAddress;
+        private BasicInfoIpAddress ipAddress { get; set; }
 
         public ServerCore(string ip=Constants.DefaultIP, int port=Constants.DefaultPort) {
             communicationWithClient = new CommunicationWithClient();

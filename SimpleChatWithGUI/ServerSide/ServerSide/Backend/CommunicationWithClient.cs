@@ -326,9 +326,9 @@ namespace ServerSide
     {
         private NetworkStream Stream { get; set; }
 
-        public RSAGenerating rsaGeneratingServer;
+        public RSAGenerating rsaGeneratingServer { get; set; }
 
-        public RSAGenerating rsaGeneratingClient;
+        public RSAGenerating rsaGeneratingClient { get; set; }
 
         public InteractWithClient(TcpClient client, RSAGenerating rsaClient, RSAGenerating rsaServer)
         {

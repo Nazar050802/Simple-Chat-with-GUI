@@ -32,7 +32,7 @@ namespace ServerSide
     public class BasicInfoIpAddress
     {
         private bool DebugMode { get; set; }
-        private IIpAdressProvider IpAddressString { get; set;}
+        private IIpAdressProvider IpAddress { get; set;}
 
         private int Port { get; set; }
 
@@ -42,17 +42,17 @@ namespace ServerSide
             Port = port;
 
             // Get ip depending on whether debug mode is currently enabled. If yes get localhost. If not get global ip
-            IpAddressString = new ExternalIpAdressProvider(ipAddressString);
+            IpAddress = new ExternalIpAdressProvider(ipAddressString);
         }
 
         public IPEndPoint GetIPEndPoint()
         {
-            return new IPEndPoint(IpAddressString.GetIPAddress(), Port);
+            return new IPEndPoint(IpAddress.GetIPAddress(), Port);
         }
 
         public IPAddress GetIPAddress()
         {
-            return IpAddressString.GetIPAddress();
+            return IpAddress.GetIPAddress();
         }
     }
 }

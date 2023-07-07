@@ -23,7 +23,9 @@ namespace ServerSide
     /// </summary>
     public partial class MainWindow : Window
     {
-        Controller controller;
+        Controller controller {get; set;}
+
+        private DateTime lastModifiedTime { get; set; }
 
         public MainWindow()
         {
@@ -58,8 +60,6 @@ namespace ServerSide
                 ReadAndDisplayLog();
             }
         }
-
-        private DateTime lastModifiedTime;
 
         private void ReadAndDisplayLog()
         {

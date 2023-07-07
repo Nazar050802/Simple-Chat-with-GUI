@@ -18,14 +18,14 @@ namespace ClientSide
     public class CommunicationWithServer
     {
         private TcpClient Client { get; set; }
-        private CancellationTokenSource cancellationTokenSource;
+        private CancellationTokenSource cancellationTokenSource {get; set;}
         private BasicClient BasicClientInfo { get; set; }
 
-        public InteractWithServer interactWithServer;
+        public InteractWithServer interactWithServer { get; set; }
 
         public bool EstablishedConnection { get; set; }
 
-        public ObservableCollection<Message> chatMessages = new ObservableCollection<Message>();
+        public ObservableCollection<Message> chatMessages { get; set; } = new ObservableCollection<Message>();
 
         public CommunicationWithServer(TcpClient client, BasicClient basicClientInfo)
         {
