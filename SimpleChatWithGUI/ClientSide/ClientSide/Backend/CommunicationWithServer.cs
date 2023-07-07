@@ -27,6 +27,8 @@ namespace ClientSide
 
         public ObservableCollection<Message> chatMessages { get; set; } = new ObservableCollection<Message>();
 
+        private string SecureCode { get; set; }
+
         public CommunicationWithServer(TcpClient client, BasicClient basicClientInfo)
         {
             Client = client;
@@ -69,13 +71,23 @@ namespace ClientSide
 
             // Send client public key to server
             await interactWithServer.SendMessageAsync(interactWithServer.rsaGeneratingClient.PublicKey);
+
+            // Get secure code from server
+            SecureCode = await interactWithServer.ReceiveMessageWithEncryptionAsync();
         }
 
         public async Task<string[]> GetRoomNamesFromServer()
         {
-            await interactWithServer.SendMessageWithEncryptionAsync(Constants.ServerMessageGetListOfRooms);
+            await interactWithServer.SendMessageWithEncryptionAsync($"{SecureCode};{Constants.ServerMessageGetListOfRooms}");
 
             string roomNames = await interactWithServer.ReceiveMessageWithEncryptionAsync();
+
+            // Get and compare the secure code. If it is not the same, close the connection.
+            if (!roomNames.Split(';')[0].Equals(SecureCode))
+            {
+                CloseConnection();
+            }
+            roomNames = string.Join(";", roomNames.Split(';').Skip(1));
 
             string[] arrayRoomNames = (roomNames.Split(';')).Skip(1).ToArray();
 
@@ -91,8 +103,16 @@ namespace ClientSide
         {
             try
             {
-                await interactWithServer.SendMessageWithEncryptionAsync($"{Constants.ServerMessageSetName};{username}");
+                await interactWithServer.SendMessageWithEncryptionAsync($"{SecureCode};{Constants.ServerMessageSetName};{username}");
                 string response = await interactWithServer.ReceiveMessageWithEncryptionAsync();
+
+                // Get and compare the secure code. If it is not the same, close the connection.
+                if (!response.Split(';')[0].Equals(SecureCode))
+                {
+                    CloseConnection();
+                }
+                response = string.Join(";", response.Split(';').Skip(1));
+
                 if (response != Constants.ServerMessageSuccessName)
                 {
                     return false;
@@ -109,7 +129,7 @@ namespace ClientSide
         public async Task SendMessageFromClientToServer(string username, string messageText)
         {
             chatMessages.Add(new Message(username, messageText, false));
-            await interactWithServer.SendMessageWithEncryptionAsync($"{Constants.ServerMessageSendMessage};{messageText}");
+            await interactWithServer.SendMessageWithEncryptionAsync($"{SecureCode};{Constants.ServerMessageSendMessage};{messageText}");
         }
 
         public void GetMessageFromAnotherClient(string message)
@@ -124,8 +144,16 @@ namespace ClientSide
         {
             try
             {
-                await interactWithServer.SendMessageWithEncryptionAsync($"{Constants.ServerMessageJoinToRoom};{roomName};{password}");
+                await interactWithServer.SendMessageWithEncryptionAsync($"{SecureCode};{Constants.ServerMessageJoinToRoom};{roomName};{password}");
                 string response = await interactWithServer.ReceiveMessageWithEncryptionAsync();
+
+                // Get and compare the secure code. If it is not the same, close the connection.
+                if (!response.Split(';')[0].Equals(SecureCode))
+                {
+                    CloseConnection();
+                }
+                response = string.Join(";", response.Split(';').Skip(1));
+
                 if (response != Constants.ServerMessageSuccessJoinToRoom)
                 {
                     return false;
@@ -144,8 +172,16 @@ namespace ClientSide
         {
             try
             {
-                await interactWithServer.SendMessageWithEncryptionAsync($"{Constants.ServerMessageCreateRoom};{roomName};{password}");
+                await interactWithServer.SendMessageWithEncryptionAsync($"{SecureCode};{Constants.ServerMessageCreateRoom};{roomName};{password}");
                 string response = await interactWithServer.ReceiveMessageWithEncryptionAsync();
+
+                // Get and compare the secure code. If it is not the same, close the connection.
+                if (!response.Split(';')[0].Equals(SecureCode))
+                {
+                    CloseConnection();
+                }
+                response = string.Join(";", response.Split(';').Skip(1));
+
                 if (response != Constants.ServerMessageSuccessCreateRoom)
                 {
                     return false;
@@ -165,8 +201,15 @@ namespace ClientSide
             try
             {
                 string message = await interactWithServer.ReceiveMessageWithEncryptionAsync();
+
                 while (!cancellationToken.IsCancellationRequested && message != "")
                 {
+                    // Get and compare the secure code. If it is not the same, close the connection.
+                    if (!message.Split(';')[0].Equals(SecureCode))
+                    {
+                        CloseConnection();
+                    }
+                    message = string.Join(";", message.Split(';').Skip(1));
 
                     // Style of getting message: [TYPE];special_info;other_info...
                     if (message.StartsWith(Constants.ServerMessageGetMessage))
@@ -205,7 +248,7 @@ namespace ClientSide
 
         public async Task SendToServerMessageAboutClosingConnection()
         {
-            await interactWithServer.SendMessageWithEncryptionAsync($"{Constants.ServerMessageCloseConnection}");
+            await interactWithServer.SendMessageWithEncryptionAsync($"{SecureCode};{Constants.ServerMessageCloseConnection}");
         }
 
         private bool IsClientConnected()

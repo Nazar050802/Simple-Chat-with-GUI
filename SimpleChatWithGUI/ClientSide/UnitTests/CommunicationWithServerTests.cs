@@ -118,7 +118,7 @@ namespace UnitTests
         public async Task GetMessageFromAnotherClient_ValidMessage_AddsMessageToChatMessages()
         {
             // Arrange
-            string message = "[some_test];username;Hello";
+            string message = "[some_test];username;Hello, world!";
 
             // Act
             await communicationWithServer.EstablishConnectionWithServer();
@@ -129,7 +129,7 @@ namespace UnitTests
             Assert.IsTrue(communicationWithServer.chatMessages.Count > 0);
             Message lastMessage = communicationWithServer.chatMessages[communicationWithServer.chatMessages.Count - 1];
             Assert.AreEqual("username", lastMessage.Username);
-            Assert.AreEqual("Hello, client!", lastMessage.Text);
+            Assert.AreEqual("Hello, world!", lastMessage.Text);
         }
 
         [Test]

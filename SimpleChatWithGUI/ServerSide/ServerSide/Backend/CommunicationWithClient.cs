@@ -78,6 +78,15 @@ namespace ServerSide
                     }
                 }
 
+                // Get and compare the secure code. If it is not the same, close the connection.
+                string[] tempStringElements = message.Split(';');
+                message = string.Join(";", tempStringElements.Skip(1));
+
+                if (!tempStringElements[0].Equals(user.SecureCode))
+                {
+                    break;
+                }
+
                 // Style of getting message: [TYPE];special_info;other_info...
                 // Case: set username from user
                 if (message.StartsWith(Constants.ServerMessageSetName))
@@ -125,11 +134,11 @@ namespace ServerSide
             string username = combinedString;
             if (clients.Any(user => user.Name == username))
             {
-                await interactWithClient.SendMessageWithEncryptionAsync(Constants.ServerMessageWrongName);
+                await interactWithClient.SendMessageWithEncryptionAsync($"{user.SecureCode};{Constants.ServerMessageWrongName}");
             }
             else
             {
-                await interactWithClient.SendMessageWithEncryptionAsync(Constants.ServerMessageSuccessName);
+                await interactWithClient.SendMessageWithEncryptionAsync($"{user.SecureCode};{Constants.ServerMessageSuccessName}");
 
                 User updatedUser = clients.FirstOrDefault(userToUpdate => userToUpdate.Id == user.Id);
                 if (updatedUser != null)
@@ -149,6 +158,9 @@ namespace ServerSide
                 // Get client public key
                 user.rsaGeneratingClient.SetPublicKeyFromString(await interactWithClient.ReceiveMessageAsync());
                 interactWithClient.rsaGeneratingClient = user.rsaGeneratingClient;
+
+                // Send Secure Code to the client
+                await interactWithClient.SendMessageWithEncryptionAsync(user.SecureCode);
             }
             catch (Exception ex)
             {
@@ -160,7 +172,7 @@ namespace ServerSide
 
         public async Task SendRoomList(User user, InteractWithClient interactWithClient)
         {
-            await interactWithClient.SendMessageWithEncryptionAsync($"{Constants.ServerMessageGetListOfRooms};{string.Join(";", rooms.Select(room => room.Name))}");
+            await interactWithClient.SendMessageWithEncryptionAsync($"{user.SecureCode};{Constants.ServerMessageGetListOfRooms};{string.Join(";", rooms.Select(room => room.Name))}");
         }
 
         public async Task JoinToRoom(User user, InteractWithClient interactWithClient, string message)
@@ -185,12 +197,12 @@ namespace ServerSide
                 if (!foundRoom.ComparePassword(password))
                 {
                     // Password incorrect send this information to user
-                    await interactWithClient.SendMessageWithEncryptionAsync(Constants.ServerMessageWrongRoomPassword);
+                    await interactWithClient.SendMessageWithEncryptionAsync($"{user.SecureCode};{Constants.ServerMessageWrongRoomPassword}");
                 }
                 else
                 {
                     // Everything is correct send this information to user
-                    await interactWithClient.SendMessageWithEncryptionAsync(Constants.ServerMessageSuccessJoinToRoom);
+                    await interactWithClient.SendMessageWithEncryptionAsync($"{user.SecureCode};{Constants.ServerMessageSuccessJoinToRoom}");
                     user.CurrentRoomName = foundRoom.Name;
                     foundRoom.UsersInRoom.Add(user.Id);
                 }
@@ -211,7 +223,7 @@ namespace ServerSide
             if (foundRoom != null)
             {
                 // Room already exist send wrong message
-                await interactWithClient.SendMessageWithEncryptionAsync(Constants.ServerMessageWrongCreateRoom);
+                await interactWithClient.SendMessageWithEncryptionAsync($"{user.SecureCode};{Constants.ServerMessageWrongCreateRoom}");
             }
             else
             {
@@ -222,7 +234,7 @@ namespace ServerSide
 
                 rooms.Add(createRoom);
 
-                await interactWithClient.SendMessageWithEncryptionAsync(Constants.ServerMessageSuccessCreateRoom);
+                await interactWithClient.SendMessageWithEncryptionAsync($"{user.SecureCode};{Constants.ServerMessageSuccessCreateRoom}");
             }
         }
 
@@ -244,7 +256,7 @@ namespace ServerSide
                     if (user.Id != currentUser.Id)
                     {
                         InteractWithClient interactWithClient = new InteractWithClient(user.TcpConnection, user.rsaGeneratingClient, user.rsaGeneratingServer);
-                        _ = interactWithClient.SendMessageWithEncryptionAsync($"{Constants.ServerMessageGetMessage};{currentUser.Name};{message}");
+                        _ = interactWithClient.SendMessageWithEncryptionAsync($"{user.SecureCode};{Constants.ServerMessageGetMessage};{currentUser.Name};{message}");
                     }
                 }
             }
