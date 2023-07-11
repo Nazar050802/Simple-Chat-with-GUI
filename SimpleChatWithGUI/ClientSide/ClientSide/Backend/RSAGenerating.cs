@@ -7,7 +7,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ServerSide
+namespace ClientSide
 {
     public class RSAGenerating
     {
@@ -15,11 +15,17 @@ namespace ServerSide
 
         protected RSAParameters KeyParams { get; set; }
 
+        /// <summary>
+        /// Constructor generate the RSA keys
+        /// </summary>
         public RSAGenerating()
         {
             GenerateKeys();
         }
 
+        /// <summary>
+        /// Generate the RSA public and private keys and convert the public key to a string
+        /// </summary>
         public void GenerateKeys()
         {
             // Generate private and public keys and also convert PublicKey in string
@@ -30,6 +36,10 @@ namespace ServerSide
             }
         }
 
+        /// <summary>
+        /// Set the public key from the provided string
+        /// </summary>
+        /// <param name="publicKey">The public key as a string</param>
         public void SetPublicKeyFromString(string publicKey)
         {
             // Set public key from string without setting a private key
@@ -41,6 +51,11 @@ namespace ServerSide
             };
         }
 
+        /// <summary>
+        /// Encrypts the provided data in bytes using the public key
+        /// </summary>
+        /// <param name="data">The data to be encrypted</param>
+        /// <returns>The encrypted data as a byte array</returns>
         public byte[] EncryptRawData(byte[] data)
         {
             // Using the public key encrypt data
@@ -51,6 +66,11 @@ namespace ServerSide
             }
         }
 
+        /// <summary>
+        /// Decrypt the provided encrypted data using the private key
+        /// </summary>
+        /// <param name="data">The encrypted data to be decrypted</param>
+        /// <returns>The decrypted data as a byte array</returns>
         public byte[] DecryptRawData(byte[] data)
         {
             // Using the private key decrypt data
@@ -61,6 +81,11 @@ namespace ServerSide
             }
         }
 
+        /// <summary>
+        /// Encrypt the provided string data using the public key
+        /// </summary>
+        /// <param name="data">The string data to be encrypted</param>
+        /// <returns>The encrypted data as a byte array</returns>
         public byte[] EncryptString(string data)
         {
             int blockSize = Constants.BufferSize;
@@ -94,6 +119,11 @@ namespace ServerSide
             return result;
         }
 
+        /// <summary>
+        /// Decrypt the provided encrypted data and returns it as a string
+        /// </summary>
+        /// <param name="data">The encrypted data to be decrypted</param>
+        /// <returns>The decrypted data as a string</returns>
         public string DecryptIntoString(byte[] data)
         {
             int blockSize = Constants.EncryptSizeBytes;

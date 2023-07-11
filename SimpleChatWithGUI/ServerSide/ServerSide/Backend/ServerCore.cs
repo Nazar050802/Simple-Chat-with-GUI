@@ -15,6 +15,11 @@ namespace ServerSide
 
         private BasicInfoIpAddress ipAddress { get; set; }
 
+        /// <summary>
+        /// Constructor initialize a new instance of the ServerCore class with the specified IP address and port
+        /// </summary>
+        /// <param name="ip">The IP address to listen on. Default is Constants.DefaultIP</param>
+        /// <param name="port">The port to listen on. Default is Constants.DefaultPort</param>
         public ServerCore(string ip=Constants.DefaultIP, int port=Constants.DefaultPort) {
             communicationWithClient = new CommunicationWithClient();
             LogFileName = "";
@@ -23,6 +28,9 @@ namespace ServerSide
             ipAddress = new BasicInfoIpAddress(Constants.DebugMode, ip, port);
         }
 
+        /// <summary>
+        /// Start the server and begin to accept client connections
+        /// </summary>
         public async void StartServer()
         {
             // Create log file

@@ -1,4 +1,4 @@
-﻿using ServerSide;
+﻿
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,6 +16,11 @@ namespace ClientSide
 
         private BasicInfoIpAddress ipAddress;
 
+        /// <summary>
+        /// Constructor initializes a new instance of the ClientCore class and sets the IP address and port for communication
+        /// </summary>
+        /// <param name="ip">The IP address as a string</param>
+        /// <param name="port">The port number</param>
         public ClientCore(string ip, int port)
         {
             communicationWithServer = new CommunicationWithServer();
@@ -24,7 +29,12 @@ namespace ClientSide
             ipAddress = new BasicInfoIpAddress(Constants.DebugMode, ip, port);
         }
 
-        public async Task StartCommunicateWithServer()
+
+        /// <summary>
+        /// Start the communication with the server asynchrony 
+        /// </summary>
+        /// <returns>Task representing the asynchronous operation</returns>
+        public async Task StartCommunicateWithServerAsync()
         {
             // Create log file
             SimpleLogs.CreateLogFile();
@@ -37,15 +47,16 @@ namespace ClientSide
 
             try
             {
-                // Start communicate
+                // Start the communication with the server
                 communicationWithServer = new CommunicationWithServer(client, basicClient);
 
                 await communicationWithServer.EstablishConnectionWithServer();
-                await communicationWithServer.InitialSetting();
+                await communicationWithServer.InitialSettingAsync();
 
             }
             catch (Exception ex)
             {
+                // Write an error message to the log file
                 SimpleLogs.WriteToFile("[ClientCore.cs][ERROR] " + ex.ToString());
                 communicationWithServer.CloseConnection();
             }

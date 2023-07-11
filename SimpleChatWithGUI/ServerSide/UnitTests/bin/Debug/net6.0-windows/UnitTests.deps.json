@@ -1048,7 +1048,8 @@
       },
       "ServerSide/1.0.0": {
         "dependencies": {
-          "ModernWpfUI": "0.9.6"
+          "ModernWpfUI": "0.9.6",
+          "NUnit": "3.13.3"
         },
         "runtime": {
           "ServerSide.dll": {}

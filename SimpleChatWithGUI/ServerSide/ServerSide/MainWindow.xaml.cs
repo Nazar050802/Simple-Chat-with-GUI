@@ -27,11 +27,19 @@ namespace ServerSide
 
         private DateTime lastModifiedTime { get; set; }
 
+        /// <summary>
+        /// Constructor initialize a new instance of the MainWindow class
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Create and starts the server at the given IP address and port
+        /// </summary>
+        /// <param name="ip">The IP address for the server</param>
+        /// <param name="port">The port for the server</param>
         public void CreateServer(string ip, int port)
         {
             controller = new Controller(ip, port);
@@ -40,6 +48,9 @@ namespace ServerSide
             ShowLogSystem();
         }
 
+        /// <summary>
+        /// Displays the log system by starting a timer to update the log every 1 second and showing the initial log contents
+        /// </summary>
         public void ShowLogSystem()
         {
             // Start a timer to refresh the log every 1 second
@@ -51,6 +62,11 @@ namespace ServerSide
             ReadAndDisplayLog();
         }
 
+        /// <summary>
+        /// Check if the log file has been updated every time the timer elapses, and if so, reads and displays the updated log
+        /// </summary>
+        /// <param name="sender">The sender of the event</param>
+        /// <param name="e">The event data</param>
         private void RefreshTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             // Check if the log file has been modified
@@ -61,6 +77,9 @@ namespace ServerSide
             }
         }
 
+        /// <summary>
+        /// Reads the contents of the log file and displays them in the log text box
+        /// </summary>
         private void ReadAndDisplayLog()
         {
             try
@@ -78,11 +97,15 @@ namespace ServerSide
                 // Update the last modified time
                 lastModifiedTime = File.GetLastWriteTime(controller.LogFileName);
             }
-            catch (Exception ex) {
-                
-            }
+            catch (Exception ex) {}
         }
 
+        /// <summary>
+        /// Handle the event when the 'Start Server' button is clicked. It gets the IP address and port from the text boxes,
+        /// validates them, and starts the server at the specified IP address and port
+        /// </summary>
+        /// <param name="sender">The sender of the event</param>
+        /// <param name="e">The event data</param>
         private void Button_Click_Start_Server(object sender, RoutedEventArgs e)
         {
             // Get the IP address and port from the text boxes

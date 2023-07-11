@@ -18,29 +18,44 @@ namespace ServerSide
         private ConcurrentBag<User> clients;
         private ConcurrentBag<Room> rooms;
 
+        /// <summary>
+        /// Constructor initialize a new instance of the CommunicationWithClient class
+        /// </summary>
         public CommunicationWithClient()
         {
             clients = new ConcurrentBag<User>();
             rooms = new ConcurrentBag<Room>();
         }
 
+        /// <summary>
+        /// Get the collection of connected clients
+        /// </summary>
+        /// <returns>The collection of connected clients</returns>
         public ConcurrentBag<User> GetClients()
         {
             return clients;
         }
 
+        /// <summary>
+        /// Get the collection of available rooms
+        /// </summary>
+        /// <returns>The collection of available rooms</returns>
         public ConcurrentBag<Room> GetRooms()
         {
             return rooms;
         }
 
+        /// <summary>
+        /// Handle the communication with a client asynchrony
+        /// </summary>
+        /// <param name="client">The TcpClient object representing the connected client</param>
         public async Task HandleClientAsync(TcpClient client)
         {
             User tempUserInfo = new User(client);
 
             InteractWithClient interactWithClient = new InteractWithClient(client, new RSAGenerating(), tempUserInfo.rsaGeneratingServer);
 
-            Tuple<User, InteractWithClient> outputInitialSetting  = await InitialSetting(tempUserInfo, interactWithClient);
+            Tuple<User, InteractWithClient> outputInitialSetting  = await InitialSettingAsync(tempUserInfo, interactWithClient);
             tempUserInfo = outputInitialSetting.Item1;
             interactWithClient = outputInitialSetting.Item2;
 
@@ -62,6 +77,11 @@ namespace ServerSide
             }
         }
 
+        /// <summary>
+        /// Start the process of receiving and transmitting messages between the client and server asynchrony
+        /// </summary>
+        /// <param name="user">User object representing the connected client</param>
+        /// <param name="interactWithClient">InteractWithClient object for client communication</param>
         public async Task StartReceiveAndSendMessagesAsync(User user, InteractWithClient interactWithClient)
         {
             string message = await interactWithClient.ReceiveMessageWithEncryptionAsync();
@@ -91,12 +111,12 @@ namespace ServerSide
                 // Case: set username from user
                 if (message.StartsWith(Constants.ServerMessageSetName))
                 {
-                    await GetAndSetUsernameFromClient(message, user, interactWithClient);
+                    await GetAndSetUsernameFromClientAsync(message, user, interactWithClient);
                 }
                 // Case: send list of rooms
                 else if (message.StartsWith(Constants.ServerMessageGetListOfRooms))
                 {
-                    await SendRoomList(user, interactWithClient);
+                    await SendRoomListAsync(user, interactWithClient);
                 }
                 // Case: close connection
                 else if (message.StartsWith(Constants.ServerMessageCloseConnection))
@@ -106,12 +126,12 @@ namespace ServerSide
                 // Case: join to room
                 else if (message.StartsWith(Constants.ServerMessageJoinToRoom))
                 {
-                    await JoinToRoom(user, interactWithClient, message);
+                    await JoinToRoomAsync(user, interactWithClient, message);
                 }
                 // Case: create room
                 else if (message.StartsWith(Constants.ServerMessageCreateRoom))
                 {
-                    await CreateRoom(user, interactWithClient, message);
+                    await CreateRoomAsync(user, interactWithClient, message);
                 }
                 // Case: get message
                 else if (message.StartsWith(Constants.ServerMessageSendMessage))
@@ -126,7 +146,13 @@ namespace ServerSide
             }
         }
 
-        public async Task GetAndSetUsernameFromClient(string message, User user, InteractWithClient interactWithClient)
+        /// <summary>
+        /// Manage the process of obtaining and setting the username from the client asynchrony
+        /// </summary>
+        /// <param name="message">Message that includes the username details</param>
+        /// <param name="user">User object representing the connected client</param>
+        /// <param name="interactWithClient">InteractWithClient object for client communication</param>
+        public async Task GetAndSetUsernameFromClientAsync(string message, User user, InteractWithClient interactWithClient)
         {
             string[] elements = message.Split(';');
             string combinedString = string.Join("", elements.Skip(1));
@@ -148,7 +174,13 @@ namespace ServerSide
             }
         }
 
-        public async Task<Tuple<User, InteractWithClient>> InitialSetting(User user, InteractWithClient interactWithClient)
+        /// <summary>
+        /// Execute the initial setting with the client asynchrony
+        /// </summary>
+        /// <param name="user">The User object representing the connected client</param>
+        /// <param name="interactWithClient">InteractWithClient object for client communication</param>
+        /// <returns>Tuple containing the updated User and InteractWithClient objects</returns>
+        public async Task<Tuple<User, InteractWithClient>> InitialSettingAsync(User user, InteractWithClient interactWithClient)
         {
             try
             {
@@ -170,12 +202,23 @@ namespace ServerSide
             return new Tuple<User, InteractWithClient>(user, interactWithClient);
         }
 
-        public async Task SendRoomList(User user, InteractWithClient interactWithClient)
+        /// <summary>
+        /// Send the list of available rooms to the client asynchrony
+        /// </summary>
+        /// <param name="user">User object representing the connected client</param>
+        /// <param name="interactWithClient">InteractWithClient object for client communication</param>
+        public async Task SendRoomListAsync(User user, InteractWithClient interactWithClient)
         {
             await interactWithClient.SendMessageWithEncryptionAsync($"{user.SecureCode};{Constants.ServerMessageGetListOfRooms};{string.Join(";", rooms.Select(room => room.Name))}");
         }
 
-        public async Task JoinToRoom(User user, InteractWithClient interactWithClient, string message)
+        /// <summary>
+        /// Join client to room asynchrony
+        /// </summary>
+        /// <param name="user">The User object representing the connected client</param>
+        /// <param name="interactWithClient">The InteractWithClient object for client communication</param>
+        /// <param name="message">Message text containing the room name and password</param>
+        public async Task JoinToRoomAsync(User user, InteractWithClient interactWithClient, string message)
         {
 
             string[] elements = message.Split(';');
@@ -209,7 +252,13 @@ namespace ServerSide
             }
         }
 
-        public async Task CreateRoom(User user, InteractWithClient interactWithClient, string message)
+        /// <summary>
+        /// Manage the process of client room creation request asynchrony
+        /// </summary>
+        /// <param name="user">User object representing the connected client</param>
+        /// <param name="interactWithClient">InteractWithClient object for client communication</param>
+        /// <param name="message">Message text containing the room name and password</param>
+        public async Task CreateRoomAsync(User user, InteractWithClient interactWithClient, string message)
         {
 
             string[] elements = message.Split(';');
@@ -238,6 +287,11 @@ namespace ServerSide
             }
         }
 
+        /// <summary>
+        /// Send a message to all users in the same room as the sender
+        /// </summary>
+        /// <param name="message">Message to be broadcasted</param>
+        /// <param name="currentUser">User object representing the message sender</param>
         public void BroadcastMessage(string message, User currentUser)
         {
             Room foundRoom = rooms.FirstOrDefault(room => room.Name == currentUser.CurrentRoomName);
@@ -262,6 +316,13 @@ namespace ServerSide
             }
         }
 
+        /// <summary>
+        /// Removes an item from a ConcurrentBag
+        /// </summary>
+        /// <typeparam name="T">The type of items in the bag</typeparam>
+        /// <param name="itemToRemove">The item to be removed from the bag</param>
+        /// <param name="oldBag">The original ConcurrentBag</param>
+        /// <returns>New ConcurrentBag without the specified item</returns>
         private ConcurrentBag<T> RemoveItemFromConcurrentBag<T>(T itemToRemove, ConcurrentBag<T> oldBag)
         {
             ConcurrentBag<T> newBag = new ConcurrentBag<T>();
@@ -279,12 +340,22 @@ namespace ServerSide
             return newBag;
         }
 
-
+        /// <summary>
+        /// Manages exception and logs it to a file.
+        /// </summary>
+        /// <param name="ex">The exception to handle</param>
+        /// <param name="additionalText">Additional text to include in the log file</param>
         private void HandleException(Exception ex, string additionalText = "")
         {
             SimpleLogs.WriteToFile($"[CommunicationWithClient.cs] {additionalText} " + ex.ToString());
         }
 
+        /// <summary>
+        /// Close the connection with a client
+        /// </summary>
+        /// <param name="client">TcpClient representing the client connection</param>
+        /// <param name="currentUser">User object representing the current client</param>
+        /// <returns>True if the connection was closed successfully, otherwise false</returns>
         private bool CloseConnection(TcpClient client, User currentUser)
         {
             try
@@ -304,7 +375,11 @@ namespace ServerSide
             return true;
         }
 
-
+        /// <summary>
+        /// Close the room associated with the current user
+        /// </summary>
+        /// <param name="currentUser">The User object representing the current client</param>
+        /// <returns>True if the room was closed successfully, otherwise false</returns>
         private bool CloseRoom(User currentUser)
         {
             try
@@ -342,6 +417,12 @@ namespace ServerSide
 
         public RSAGenerating rsaGeneratingClient { get; set; }
 
+        /// <summary>
+        /// Constructoir initialize a new instance of the InteractWithClient class
+        /// </summary>
+        /// <param name="client">The TcpClient representing the connected client</param>
+        /// <param name="rsaClient">The RSAGenerating object for RSA encryption/decryption on client side</param>
+        /// <param name="rsaServer">The RSAGenerating object for RSA encryption/decryption on server side</param>
         public InteractWithClient(TcpClient client, RSAGenerating rsaClient, RSAGenerating rsaServer)
         {
             Stream = client.GetStream();
@@ -350,6 +431,10 @@ namespace ServerSide
             rsaGeneratingServer = rsaServer;
         }
 
+        /// <summary>
+        /// Receive an encrypted message from server asynchrony
+        /// </summary>
+        /// <returns>The received decrypted message</returns>
         public async Task<string> ReceiveMessageWithEncryptionAsync()
         {
             string message = "";
@@ -371,6 +456,10 @@ namespace ServerSide
             return message;
         }
 
+        /// <summary>
+        /// Receive a message from server asynchrony
+        /// </summary>
+        /// <returns>The received message</returns>
         public async Task<string> ReceiveMessageAsync()
         {
             string message = "";
@@ -392,6 +481,10 @@ namespace ServerSide
             return message;
         }
 
+        /// <summary>
+        /// Send an encrypted message to server asynchrony
+        /// </summary>
+        /// <param name="message">The message to send</param>
         public async Task SendMessageWithEncryptionAsync(string message)
         {
             try
@@ -406,6 +499,10 @@ namespace ServerSide
             }
         }
 
+        /// <summary>
+        /// Send a message to server asynchrony
+        /// </summary>
+        /// <param name="message">The message to send</param>
         public async Task SendMessageAsync(string message)
         {
             try
@@ -420,9 +517,13 @@ namespace ServerSide
             }
         }
 
+        /// <summary>
+        /// Close the stream connection
+        /// </summary>
         public void CloseStreamConnection()
         {
             Stream.Close();
         }
     }
+
 }

@@ -5,6 +5,9 @@ namespace UnitTests
     [TestFixture]
     public class BasicInfoIpAddressTests
     {
+        /// <summary>
+        /// Test to check that GetIPEndPoint method returns the correct IPEndPoint
+        /// </summary>
         [Test]
         public void GetIPEndPoint_ReturnsCorrectIPEndPoint()
         {
@@ -25,6 +28,9 @@ namespace UnitTests
             Assert.AreEqual(expectedIPEndPoint.Port, result.Port);
         }
 
+        /// <summary>
+        /// Test to check that GetIPAddress method returns the correct IPAddress
+        /// </summary>
         [Test]
         public void GetIPAddress_ReturnsCorrectIPAddress()
         {

@@ -1,4 +1,4 @@
-﻿using ServerSide;
+﻿using ClientSide;
 using System;
 using System.CodeDom;
 using System.Collections.Concurrent;
@@ -29,6 +29,11 @@ namespace ClientSide
 
         private string SecureCode { get; set; }
 
+        /// <summary>
+        /// Constructor set up client, basic client details, initializes a cancellation token source, and sets connection status flag
+        /// </summary>
+        /// <param name="client">TcpClient used for communication with server</param>
+        /// <param name="basicClientInfo">BasicClient object containing basic client information</param>
         public CommunicationWithServer(TcpClient client, BasicClient basicClientInfo)
         {
             Client = client;
@@ -38,13 +43,22 @@ namespace ClientSide
             EstablishedConnection = false;
         }
 
+        /// <summary>
+        /// Empty constructor
+        /// </summary>
         public CommunicationWithServer() { }
 
+        /// <summary>
+        /// Connect client to server asynchrony 
+        /// </summary>
         public async Task ConnectClientAsync()
         {
             await Client.ConnectAsync(BasicClientInfo.IpAddress, BasicClientInfo.Port);
         }
 
+        /// <summary>
+        /// Establishe connection with server asynchrony 
+        /// </summary>
         public async Task EstablishConnectionWithServer()
         {
             while (!IsClientConnected())
@@ -64,7 +78,10 @@ namespace ClientSide
             interactWithServer = new InteractWithServer(Client.GetStream(), new RSAGenerating(), new RSAGenerating());
         }
 
-        public async Task InitialSetting()
+        /// <summary>
+        /// Perform the initial setup asynchrony 
+        /// </summary>
+        public async Task InitialSettingAsync()
         {
             // Get server public key
             interactWithServer.rsaGeneratingServer.SetPublicKeyFromString(await interactWithServer.ReceiveMessageAsync());
@@ -76,13 +93,17 @@ namespace ClientSide
             SecureCode = await interactWithServer.ReceiveMessageWithEncryptionAsync();
         }
 
-        public async Task<string[]> GetRoomNamesFromServer()
+        /// <summary>
+        /// Get the names of available chat rooms from server asynchrony 
+        /// </summary>
+        /// <returns>An array of room names</returns>
+        public async Task<string[]> GetRoomNamesFromServerAsync()
         {
             await interactWithServer.SendMessageWithEncryptionAsync($"{SecureCode};{Constants.ServerMessageGetListOfRooms}");
 
             string roomNames = await interactWithServer.ReceiveMessageWithEncryptionAsync();
 
-            // Get and compare the secure code. If it is not the same, close the connection.
+            // Get and compare the secure code. If it is not the same, close the connection
             if (!roomNames.Split(';')[0].Equals(SecureCode))
             {
                 CloseConnection();
@@ -94,12 +115,20 @@ namespace ClientSide
             return arrayRoomNames;
         }
 
+        /// <summary>
+        /// Start receiving messages from  server in a background task
+        /// </summary>
         public void StartToReveiveMessages()
         {
             _ = Task.Run(() => ReceiveMessagesAsync(cancellationTokenSource.Token));
         }
 
-        public async Task<bool> SetUsernameToServer(string username)
+        /// <summary>
+        /// Set the username for client on server asynchrony 
+        /// </summary>
+        /// <param name="username">The username to set</param>
+        /// <returns>True if the username was set successfully, otherwise false</returns>
+        public async Task<bool> SetUsernameToServerAsync(string username)
         {
             try
             {
@@ -126,12 +155,21 @@ namespace ClientSide
             return true;
         }
 
-        public async Task SendMessageFromClientToServer(string username, string messageText)
+        /// <summary>
+        /// Send a message from client to server asynchrony 
+        /// </summary>
+        /// <param name="username">The username of client</param>
+        /// <param name="messageText">The text of message</param>
+        public async Task SendMessageFromClientToServerAsync(string username, string messageText)
         {
             chatMessages.Add(new Message(username, messageText, false));
             await interactWithServer.SendMessageWithEncryptionAsync($"{SecureCode};{Constants.ServerMessageSendMessage};{messageText}");
         }
 
+        /// <summary>
+        /// Get a message received from another client
+        /// </summary>
+        /// <param name="message">The received message</param>
         public void GetMessageFromAnotherClient(string message)
         {
             string[] elements = message.Split(';');
@@ -140,7 +178,13 @@ namespace ClientSide
             chatMessages.Add(new Message(elements[1], combinedString, true));
         }
 
-        public async Task<bool> SendJoinRoomAttemptToServer(string roomName, string password)
+        /// <summary>
+        /// Send a join room attempt to server asynchrony 
+        /// </summary>
+        /// <param name="roomName">The name of the room to join</param>
+        /// <param name="password">The password for the room</param>
+        /// <returns>True if the join attempt was successful, otherwise false</returns>
+        public async Task<bool> SendJoinRoomAttemptToServerAsync(string roomName, string password)
         {
             try
             {
@@ -168,7 +212,13 @@ namespace ClientSide
             return true;
         }
 
-        public async Task<bool> SendCreateRoomAttemptToServer(string roomName, string password)
+        /// <summary>
+        /// Send a create room attempt to server asynchrony 
+        /// </summary>
+        /// <param name="roomName">The name of the room to create</param>
+        /// <param name="password">The password for the room</param>
+        /// <returns>True if the create attempt was successful, false otherwise</returns>
+        public async Task<bool> SendCreateRoomAttemptToServerAsync(string roomName, string password)
         {
             try
             {
@@ -196,6 +246,10 @@ namespace ClientSide
             return true;
         }
 
+        /// <summary>
+        /// Receive messages from server asynchrony 
+        /// </summary>
+        /// <param name="cancellationToken">Cancellation token for task cancellation</param>
         public async Task ReceiveMessagesAsync(CancellationToken cancellationToken)
         {
             try
@@ -227,6 +281,10 @@ namespace ClientSide
             }
         }
 
+        /// <summary>
+        /// Close the connection with server
+        /// </summary>
+        /// <returns>True if the connection was closed successfully, otherwise false</returns>
         public bool CloseConnection()
         {
             try
@@ -246,11 +304,18 @@ namespace ClientSide
             return true;
         }
 
-        public async Task SendToServerMessageAboutClosingConnection()
+        /// <summary>
+        /// Send a message to server indicating client is closing the connection asynchrony 
+        /// </summary>
+        public async Task SendToServerMessageAboutClosingConnectionAsync()
         {
             await interactWithServer.SendMessageWithEncryptionAsync($"{SecureCode};{Constants.ServerMessageCloseConnection}");
         }
 
+        /// <summary>
+        /// Check if client is connected to server
+        /// </summary>
+        /// <returns>True if client is connected, otherwise false</returns>
         private bool IsClientConnected()
         {
             return Client.Connected;
@@ -266,6 +331,12 @@ namespace ClientSide
 
         public RSAGenerating rsaGeneratingClient;
 
+        /// <summary>
+        /// Constructor initialize a new instance of the InteractWithServer class
+        /// </summary>
+        /// <param name="stream">The NetworkStream used for communication with server</param>
+        /// <param name="rsaClient">The RSAGenerating object for RSA encryption/decryption on client side</param>
+        /// <param name="rsaServer">The RSAGenerating object for RSA encryption/decryption on server side</param>
         public InteractWithServer(NetworkStream stream, RSAGenerating rsaClient, RSAGenerating rsaServer)
         {
             Stream = stream;
@@ -273,6 +344,10 @@ namespace ClientSide
             rsaGeneratingServer = rsaServer;
         }
 
+        /// <summary>
+        /// Receive an encrypted message from server asynchrony
+        /// </summary>
+        /// <returns>The received decrypted message</returns>
         public async Task<string> ReceiveMessageWithEncryptionAsync()
         {
             string message = "";
@@ -294,6 +369,10 @@ namespace ClientSide
             return message;
         }
 
+        /// <summary>
+        /// Receive a message from server asynchrony
+        /// </summary>
+        /// <returns>The received message</returns>
         public async Task<string> ReceiveMessageAsync()
         {
             string message = "";
@@ -315,6 +394,10 @@ namespace ClientSide
             return message;
         }
 
+        /// <summary>
+        /// Send an encrypted message to server asynchrony
+        /// </summary>
+        /// <param name="message">The message to send</param>
         public async Task SendMessageWithEncryptionAsync(string message)
         {
             try
@@ -329,6 +412,10 @@ namespace ClientSide
             }
         }
 
+        /// <summary>
+        /// Send a message to server asynchrony
+        /// </summary>
+        /// <param name="message">The message to send</param>
         public async Task SendMessageAsync(string message)
         {
             try
@@ -343,6 +430,9 @@ namespace ClientSide
             }
         }
 
+        /// <summary>
+        /// Close the stream connection
+        /// </summary>
         public void CloseStreamConnection()
         {
             Stream.Close();

@@ -18,6 +18,12 @@ namespace ClientSide
 
         public string Time { get; set; }
 
+        /// <summary>
+        /// Constructor the Message class
+        /// </summary>
+        /// <param name="username">The username of message sender or receiver</param>
+        /// <param name="text">The text content of message</param>
+        /// <param name="senderOrReceiver">Flag indicating whether message was sent or received</param>
         public Message(string username, string text, bool senderOrReceiver) {
             Username = username;
             Text = text;

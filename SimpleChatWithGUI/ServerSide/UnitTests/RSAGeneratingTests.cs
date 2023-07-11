@@ -5,12 +5,18 @@ namespace UnitTests
     {
         private RSAGenerating rsaGenerator;
 
+        /// <summary>
+        /// Setup method for the test fixture
+        /// </summary>
         [SetUp]
         public void SetUp()
         {
             rsaGenerator = new RSAGenerating();
         }
 
+        /// <summary>
+        /// Test to check that GenerateKeys method generates non null public key
+        /// </summary>
         [Test]
         public void GenerateKeys_PublicKeyNotNull()
         {
@@ -21,6 +27,9 @@ namespace UnitTests
             Assert.IsNotNull(rsaGenerator.PublicKey);
         }
 
+        /// <summary>
+        /// Test to check that EncryptRawData and DecryptRawData methods correctly encrypt and decrypt raw data
+        /// </summary>
         [Test]
         public void EncryptRawData_DecryptRawData_MatchOriginalData()
         {
@@ -36,6 +45,9 @@ namespace UnitTests
             CollectionAssert.AreEqual(originalData, decryptedData);
         }
 
+        /// <summary>
+        /// Test to check that EncryptString and DecryptIntoString methods correctly encrypt and decrypt a string
+        /// </summary>
         [Test]
         public void EncryptString_DecryptIntoString_MatchOriginalData()
         {

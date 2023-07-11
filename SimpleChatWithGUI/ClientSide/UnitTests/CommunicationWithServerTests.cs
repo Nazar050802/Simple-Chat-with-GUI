@@ -16,6 +16,9 @@ namespace UnitTests
         private BasicClient basicClientInfo;
         private CommunicationWithServer communicationWithServer;
 
+        /// <summary>
+        /// Setup method for the test fixture
+        /// </summary>
         [SetUp]
         public void Setup()
         {
@@ -24,12 +27,18 @@ namespace UnitTests
             communicationWithServer = new CommunicationWithServer(tcpClient, basicClientInfo);
         }
 
+        /// <summary>
+        /// Tear down method for the test fixture
+        /// </summary>
         [TearDown]
         public void TearDown()
         {
             communicationWithServer.CloseConnection();
         }
 
+        /// <summary>
+        /// Test to check that ConnectClientAsync method connects the client to the server
+        /// </summary>
         [Test]
         public async Task ConnectClientAsync_ClientConnected()
         { 
@@ -40,6 +49,9 @@ namespace UnitTests
             Assert.IsTrue(tcpClient.Connected);
         }
 
+        /// <summary>
+        /// Test to check that EstablishConnectionWithServer method establishes a connection with the server
+        /// </summary>
         [Test]
         public async Task EstablishConnectionWithServer_ConnectionEstablished()
         {
@@ -51,17 +63,23 @@ namespace UnitTests
             Assert.IsNotNull(communicationWithServer.interactWithServer);
         }
 
+        /// <summary>
+        /// Test to check that InitialSettingAsync method sets the server public key
+        /// </summary>
         [Test]
         public async Task InitialSetting_ServerPublicKeySet()
         {
             // Act
             await communicationWithServer.EstablishConnectionWithServer();
-            await communicationWithServer.InitialSetting();
+            await communicationWithServer.InitialSettingAsync();
 
             // Assert
             Assert.IsNotNull(communicationWithServer.interactWithServer.rsaGeneratingServer.PublicKey);
         }
 
+        /// <summary>
+        /// Test to check that GetRoomNamesFromServerAsync method returns room names
+        /// </summary>
         [Test]
         public async Task GetRoomNamesFromServer_ReturnsRoomNames()
         {
@@ -71,15 +89,18 @@ namespace UnitTests
 
             // Act
             await communicationWithServer.EstablishConnectionWithServer();
-            await communicationWithServer.InitialSetting();
-            await communicationWithServer.SendCreateRoomAttemptToServer(roomName, password);
-            string[] roomNames = await communicationWithServer.GetRoomNamesFromServer();
+            await communicationWithServer.InitialSettingAsync();
+            await communicationWithServer.SendCreateRoomAttemptToServerAsync(roomName, password);
+            string[] roomNames = await communicationWithServer.GetRoomNamesFromServerAsync();
 
             // Assert
             Assert.IsNotNull(roomNames);
             Assert.IsNotEmpty(roomNames);
         }
 
+        /// <summary>
+        /// Test to check that SetUsernameToServerAsync method sets the username on the server and returns true
+        /// </summary>
         [Test]
         public async Task SetUsernameToServer_ValidUsername_ReturnsTrue()
         {
@@ -88,13 +109,16 @@ namespace UnitTests
 
             // Act
             await communicationWithServer.EstablishConnectionWithServer();
-            await communicationWithServer.InitialSetting();
-            bool result = await communicationWithServer.SetUsernameToServer(username);
+            await communicationWithServer.InitialSettingAsync();
+            bool result = await communicationWithServer.SetUsernameToServerAsync(username);
 
             // Assert
             Assert.IsTrue(result);
         }
 
+        /// <summary>
+        /// Test to check that SendMessageFromClientToServerAsync method sends a message successfully
+        /// </summary>
         [Test]
         public async Task SendMessageFromClientToServer_MessageSentSuccessfully()
         {
@@ -104,8 +128,8 @@ namespace UnitTests
 
             // Act
             await communicationWithServer.EstablishConnectionWithServer();
-            await communicationWithServer.InitialSetting();
-            await communicationWithServer.SendMessageFromClientToServer(username, messageText);
+            await communicationWithServer.InitialSettingAsync();
+            await communicationWithServer.SendMessageFromClientToServerAsync(username, messageText);
 
             // Assert
             Assert.IsTrue(communicationWithServer.chatMessages.Count > 0);
@@ -114,6 +138,9 @@ namespace UnitTests
             Assert.AreEqual(messageText, lastMessage.Text);
         }
 
+        /// <summary>
+        /// Test to check that GetMessageFromAnotherClient method adds a message to chat messages
+        /// </summary>
         [Test]
         public async Task GetMessageFromAnotherClient_ValidMessage_AddsMessageToChatMessages()
         {
@@ -122,7 +149,7 @@ namespace UnitTests
 
             // Act
             await communicationWithServer.EstablishConnectionWithServer();
-            await communicationWithServer.InitialSetting();
+            await communicationWithServer.InitialSettingAsync();
             communicationWithServer.GetMessageFromAnotherClient(message);
 
             // Assert
@@ -132,6 +159,9 @@ namespace UnitTests
             Assert.AreEqual("Hello, world!", lastMessage.Text);
         }
 
+        /// <summary>
+        /// Test to check that SendJoinRoomAttemptToServerAsync method sends a valid room join request and returns true
+        /// </summary>
         [Test]
         public async Task SendJoinRoomAttemptToServer_ValidRoom_ReturnsTrue()
         {
@@ -141,14 +171,17 @@ namespace UnitTests
 
             // Act
             await communicationWithServer.EstablishConnectionWithServer();
-            await communicationWithServer.InitialSetting();
-            await communicationWithServer.SendCreateRoomAttemptToServer(roomName, password);
-            bool result = await communicationWithServer.SendJoinRoomAttemptToServer(roomName, password);
+            await communicationWithServer.InitialSettingAsync();
+            await communicationWithServer.SendCreateRoomAttemptToServerAsync(roomName, password);
+            bool result = await communicationWithServer.SendJoinRoomAttemptToServerAsync(roomName, password);
 
             // Assert
             Assert.IsTrue(result);
         }
 
+        /// <summary>
+        /// Test to check that SendCreateRoomAttemptToServerAsync method sends a valid room creation request and returns true
+        /// </summary>
         [Test]
         public async Task SendCreateRoomAttemptToServer_ValidRoom_ReturnsTrue()
         {
@@ -158,8 +191,8 @@ namespace UnitTests
 
             // Act
             await communicationWithServer.EstablishConnectionWithServer();
-            await communicationWithServer.InitialSetting();
-            bool result = await communicationWithServer.SendCreateRoomAttemptToServer(roomName, password);
+            await communicationWithServer.InitialSettingAsync();
+            bool result = await communicationWithServer.SendCreateRoomAttemptToServerAsync(roomName, password);
 
             // Assert
             Assert.IsTrue(result);

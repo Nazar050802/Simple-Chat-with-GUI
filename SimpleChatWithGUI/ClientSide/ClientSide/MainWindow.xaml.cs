@@ -15,7 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using ServerSide;
+using ClientSide;
 
 namespace ClientSide
 {
@@ -33,6 +33,9 @@ namespace ClientSide
 
         Controller controller;
 
+        /// <summary>
+        /// Create a new instance of the MainWindow class
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
@@ -49,6 +52,9 @@ namespace ClientSide
 
         }
 
+        /// <summary>
+        /// Attempt to connect to the server in regular intervals
+        /// </summary>
         private void TryToConnectToTheServer()
         {
             connectionTimer.Interval = TimeSpan.FromSeconds(1);
@@ -66,6 +72,9 @@ namespace ClientSide
             }
         }
 
+        /// <summary>
+        /// Refresh the room names at regular timeframes
+        /// </summary>
         private void UpdateRoomNames()
         {
             getRoomNamesTimer.Interval = TimeSpan.FromSeconds(1);
@@ -73,10 +82,13 @@ namespace ClientSide
         }
         private void UpdateRoomNames_Tick(object sender, EventArgs e)
         {
-            _ = controller.UpdateRoomsNames();
+            _ = controller.UpdateRoomsNamesAsync();
             roomsListBox.ItemsSource = controller.RoomsNames;
         }
 
+        /// <summary>
+        /// Display messages at regular intervals
+        /// </summary>
         private void ShowMessages()
         {
             messageTimer.Interval = TimeSpan.FromSeconds(1);
@@ -86,7 +98,7 @@ namespace ClientSide
 
         private void MessageTimer_Tick(object sender, EventArgs e)
         {
-            _ = controller.SetNewMessage();
+            _ = controller.SetNewMessageAsync();
 
             // Check for new messages in the Messages dictionary
             foreach (var message in controller.GetNewMessages())
@@ -100,6 +112,12 @@ namespace ClientSide
             controller.VariableUpdateChatMessages();
         }
 
+        /// <summary>
+        /// Add a message to the chat container.
+        /// </summary>
+        /// <param name="userNickname">The nickname of user who sent message</param>
+        /// <param name="message">The message content</param>
+        /// <param name="senderOrReceiver">A flag indicating whether user is sender or the receiver of message</param>
         private void AddMessageToChat(string userNickname, string message, bool senderOrReceiver)
         {
             double maxMessageWidth = (this.ActualWidth / 2) * 1.25;
@@ -156,6 +174,11 @@ namespace ClientSide
             ChatScrollViewer.ScrollToBottom();
         }
 
+        /// <summary>
+        /// Generate a pastel color based on the input string
+        /// </summary>
+        /// <param name="inputString">Input string used to generate  color</param>
+        /// <returns>Color object representing  generated pastel color</returns>
         private Color GeneratePastelColorFromString(string inputString)
         {
             // Get hash from string
@@ -172,6 +195,11 @@ namespace ClientSide
             return Color.FromRgb(r, g, b);
         }
 
+        /// <summary>
+        /// Compute the Jenkins hash value of the input string
+        /// </summary>
+        /// <param name="input">The input string</param>
+        /// <returns>The computed Jenkins hash value</returns>
         private uint JenkinsHash(string input)
         {
             uint hash = 0;
@@ -190,6 +218,9 @@ namespace ClientSide
             return hash;
         }
 
+        /// <summary>
+        /// Execute when the TextBox control gains focus. Clear default text and adjusts the opacity
+        /// </summary>
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
             // Change opacity of text in textBox
@@ -203,6 +234,9 @@ namespace ClientSide
             tb.Opacity = 1;
         }
 
+        /// <summary>
+        /// Handle the event when a selection is made in the rooms list box. Set the text of textBoxRoomNameDirectly to the selected room name
+        /// </summary>
         private void RoomsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             string selectedItemName = roomsListBox.SelectedItem.ToString();
@@ -212,15 +246,25 @@ namespace ClientSide
             textBoxRoomNameDirectly.Text = selectedItemName;
         }
 
+        /// <summary>
+        /// Send a message asynchrony 
+        /// </summary>
+        /// <param name="sender">The object that raised the event</param>
+        /// <param name="e">The event arguments</param>
         private async void SendMessageAsync(object sender, RoutedEventArgs e)
         {
             if (!string.IsNullOrWhiteSpace(messageTextBox.Text))
             {
-                await controller.SendMessage($"{messageTextBox.Text}");
+                await controller.SendMessageAsync($"{messageTextBox.Text}");
                 messageTextBox.Text = "";
             }
         }
 
+        /// <summary>
+        /// Handle the click event of a button asynchrony 
+        /// </summary>
+        /// <param name="sender">The object that raised the event</param>
+        /// <param name="e">The event arguments</param>
         private async void Button_ClickAsync(object sender, RoutedEventArgs e)
         {
             if (!string.IsNullOrWhiteSpace(textBoxUsername.Text))
@@ -240,6 +284,12 @@ namespace ClientSide
                 }
             }
         }
+
+        /// <summary>
+        /// Handle the click event of a button to continue the process
+        /// </summary>
+        /// <param name="sender">The object that raised the event</param>
+        /// <param name="e">The event arguments</param>
         private void ButtonContinue_Click(object sender, RoutedEventArgs e)
         {
             if (!string.IsNullOrWhiteSpace(textBoxRoomNameDirectly.Text))
@@ -256,6 +306,12 @@ namespace ClientSide
             }
         }
 
+
+        /// <summary>
+        /// Handle the click event of the Join button asynchrony 
+        /// </summary>
+        /// <param name="sender">The object that raised the event</param>
+        /// <param name="e">The event arguments</param>
         private async void JoinButton_ClickAsync(object sender, RoutedEventArgs e)
         {
             if (!string.IsNullOrWhiteSpace(textBoxRoomNameDirectly.Text) && !string.IsNullOrWhiteSpace(textBoxRoomPassword.Text))
@@ -274,6 +330,11 @@ namespace ClientSide
             }
         }
 
+        /// <summary>
+        /// Handle the click event of the Join Choosing button
+        /// </summary>
+        /// <param name="sender">The object that raised the event</param>
+        /// <param name="e">The event arguments</param>
         private void JoinChoosingButton_Click(object sender, RoutedEventArgs e)
         {
             selectOrCreateRoomGridSelectGrid.Visibility = Visibility.Hidden;
@@ -281,12 +342,23 @@ namespace ClientSide
             selectOrCreateRoomGridRoomNameGrid.Visibility = Visibility.Visible;
         }
 
+        /// <summary>
+        /// Handle the click event of the Create Choosing button
+        /// </summary>
+        /// <param name="sender">The object that raised the event</param>
+        /// <param name="e">The event arguments</param>
         private void CreateChoosingButton_Click(object sender, RoutedEventArgs e)
         {
             selectOrCreateRoomGridSelectGrid.Visibility = Visibility.Hidden;
 
             selectOrCreateRoomGridCreateGrid.Visibility = Visibility.Visible;
         }
+
+        /// <summary>
+        /// Handle the click event of the Create button asynchrony 
+        /// </summary>
+        /// <param name="sender">The object that raised the event</param>
+        /// <param name="e">The event arguments</param>
         private async void CreateButton_ClickAsync(object sender, RoutedEventArgs e)
         {
             if (!string.IsNullOrWhiteSpace(textBoxCreateRoomName.Text) && !string.IsNullOrWhiteSpace(textBoxCreateRoomPassword.Text))
@@ -305,6 +377,9 @@ namespace ClientSide
             }
         }
 
+        /// <summary>
+        /// Manage the visibility of different grids based on chat grid's visibility state
+        /// </summary>
         private void MyGrid_VisibilityChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             if (chatGrid.Visibility == Visibility.Visible)
@@ -315,6 +390,9 @@ namespace ClientSide
             }
         }
 
+        /// <summary>
+        /// Manage the ButtonBackToChoose control's Click event
+        /// </summary>
         public void ButtonBackToChoose_Click(object sender, RoutedEventArgs e)
         {
             selectOrCreateRoomGridRoomNameGrid.Visibility = Visibility.Hidden;
@@ -323,6 +401,9 @@ namespace ClientSide
             selectOrCreateRoomGridSelectGrid.Visibility = Visibility.Visible;
         }
 
+        /// <summary>
+        /// Execute when the Window is closed. Close the communication through the controller
+        /// </summary>
         private void Window_Closed(object sender, EventArgs e)
         {
             controller.CloseCommunication();

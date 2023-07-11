@@ -8,6 +8,10 @@ namespace UnitTests
 
         private BasicInfoIpAddress ipAddress;
 
+
+        /// <summary>
+        /// Set up method for the test fixture
+        /// </summary>
         [SetUp]
         public void SetUp()
         {
@@ -19,6 +23,9 @@ namespace UnitTests
             ipAddress = new BasicInfoIpAddress(debugModeSetUp, ipAddressSetUp, portSetUp);
         }
 
+        /// <summary>
+        /// Test to check that the constructor initializes the IP address and port
+        /// </summary>
         [Test]
         public void Constructor_InitializesIpAddressAndPort()
         {
@@ -34,6 +41,9 @@ namespace UnitTests
             Assert.AreEqual(portEquals, client.Port);
         }
 
+        /// <summary>
+        /// Test to check that GetTcpClient method returns a TcpClient instance
+        /// </summary>
         [Test]
         public void GetTcpClient_ReturnsTcpClientInstance()
         {

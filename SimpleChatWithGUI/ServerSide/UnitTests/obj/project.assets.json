@@ -1380,7 +1380,8 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
         "dependencies": {
-          "ModernWpfUI": "0.9.6"
+          "ModernWpfUI": "0.9.6",
+          "NUnit": "3.13.3"
         },
         "compile": {
           "bin/placeholder/ServerSide.dll": {}

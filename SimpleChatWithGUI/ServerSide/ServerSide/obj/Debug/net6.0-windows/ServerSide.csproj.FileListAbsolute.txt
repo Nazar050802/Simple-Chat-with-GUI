@@ -149,3 +149,4 @@ D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ServerSide\ServerSi
 D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ServerSide\ServerSide\obj\Debug\net6.0-windows\ServerSide.pdb
 D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ServerSide\ServerSide\obj\Debug\net6.0-windows\ServerSide.genruntimeconfig.cache
 D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ServerSide\ServerSide\obj\Debug\net6.0-windows\ref\ServerSide.dll
+D:\Programming\GitHub\Simple-Chat-with-GUI\SimpleChatWithGUI\ServerSide\ServerSide\bin\Debug\net6.0-windows\nunit.framework.dll

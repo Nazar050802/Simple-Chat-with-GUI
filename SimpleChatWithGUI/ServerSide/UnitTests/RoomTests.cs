@@ -10,6 +10,9 @@ namespace UnitTests
     [TestFixture]
     public class RoomTests
     {
+        /// <summary>
+        /// Test to check the ComparePassword method of the Room class when a valid password is provided
+        /// </summary>
         [Test]
         public void ComparePassword_ValidPassword_ReturnsTrue()
         {
@@ -24,6 +27,9 @@ namespace UnitTests
             Assert.IsTrue(result);
         }
 
+        /// <summary>
+        /// Test to check the ComparePassword method of the Room class when an invalid password is provided
+        /// </summary>
         [Test]
         public void ComparePassword_InvalidPassword_ReturnsFalse()
         {
@@ -39,6 +45,9 @@ namespace UnitTests
             Assert.IsFalse(result);
         }
 
+        /// <summary>
+        /// Test to check the initialization of the UsersInRoom property of the Room class.
+        /// </summary>
         [Test]
         public void UsersInRoom_InitializedEmpty()
         {

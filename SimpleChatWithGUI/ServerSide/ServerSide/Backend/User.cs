@@ -26,6 +26,10 @@ namespace ServerSide
 
         public string CurrentRoomName { get; set; }
 
+        /// <summary>
+        /// Constructor initialize a new instance of the User class with the specified TCP client connection
+        /// </summary>
+        /// <param name="client">The TCP client connection associated with the user</param>
         public User(TcpClient client) {
 
             TcpConnection = client;

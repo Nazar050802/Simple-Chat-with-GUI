@@ -25,12 +25,16 @@ namespace UnitTests
             listener.Start();
         }
 
-        [OneTimeTearDown]
+        [TearDown]
         public void OneTimeTearDown()
         {
             listener.Stop();
         }
 
+        /// <summary>
+        /// Test to check HandleClientAsync method of the CommunicationWithClient class by verifying
+        /// that the client is connected after handling the client asynchrony 
+        /// </summary>
         [Test]
         public async Task Test_HandleClientAsync()
         {
@@ -44,6 +48,10 @@ namespace UnitTests
             Assert.IsTrue(client.Connected);
         }
 
+        /// <summary>
+        /// Test to check the HandleClientAsync method of the CommunicationWithClient class when the client message is "SetName" by verifying
+        /// that the GetClients and SetUsernameFromClient methods are called correctly.
+        /// </summary>
         [Test]
         public async Task HandleClientAsync_WhenClientMessageIsSetName_CallsGetAndSetUsernameFromClient()
         {
@@ -63,6 +71,11 @@ namespace UnitTests
             // Close program window, start next test in the new window
         }
 
+
+        /// <summary>
+        /// Test to check the StartReceiveAndSendMessagesAsync method of the CommunicationWithClient class when the message is "CreateRoom" 
+        /// by verifying that the CreateRoom method is called correctly.
+        /// </summary>
         [Test]
         public async Task StartReceiveAndSendMessagesAsync_WhenMessageIsCreateRoom_CallsCreateRoom()
         {
@@ -83,6 +96,10 @@ namespace UnitTests
             // Close program window, start next test in the new window
         }
 
+        /// <summary>
+        /// Test to check the JoinToRoom method of the CommunicationWithClient class when the room exists and the password is correct 
+        /// by verifying that the user successfully joins the room.
+        /// </summary>
         [Test]
         public async Task JoinToRoom_WhenRoomExistsAndPasswordIsCorrect_JoinsToRoom()
         {

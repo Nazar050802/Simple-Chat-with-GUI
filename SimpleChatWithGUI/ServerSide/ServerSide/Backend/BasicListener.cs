@@ -8,14 +8,23 @@ using System.Threading.Tasks;
 
 namespace ServerSide
 {
+    /// <summary>
+    /// Interface for a socket factory.
+    /// </summary>
     public interface ISocketFactory
     {
         Socket CreateSocket(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType);
     }
 
-    // Class for Tcp protocol type of communication
     public class TcpSocketFactory : ISocketFactory
     {
+        /// <summary>
+        /// Create a new socket based on the supplied address family, socket type, and protocol type
+        /// </summary>
+        /// <param name="addressFamily">Address family for the socket</param>
+        /// <param name="socketType">Type of socket to create</param>
+        /// <param name="protocolType">Protocol type for the socket</param>
+        /// <returns>The newly created socket</returns>
         public Socket CreateSocket(AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType)
         {
             return new Socket(addressFamily, socketType, protocolType);
@@ -28,6 +37,11 @@ namespace ServerSide
         private IPAddress IpAddress { get; set; }
         public int Backlog { get; set; }
 
+        /// <summary>
+        /// Initialize a new instance of BasicListener
+        /// </summary>
+        /// <param name="ipAddress">Information about the IP address</param>
+        /// <param name="backlog">The maximum length of the queue of pending connections</param>
         public BasicListener(BasicInfoIpAddress ipAddress, int backlog = 10) 
         {
             // Get information about ip from object of class BasicInfoIpAddress
@@ -36,6 +50,10 @@ namespace ServerSide
             Backlog = backlog;  
         }
 
+        /// <summary>
+        /// Generate a new TcpListener based on the IP endpoint information
+        /// </summary>
+        /// <returns>The created TcpListener</returns>
         public TcpListener GetTcpListener()
         {
             // Create new listener
