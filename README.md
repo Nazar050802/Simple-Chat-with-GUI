@@ -115,7 +115,7 @@ Security is a paramount concern in the design of the Simple Chat application. He
 - **Secure Code Verification:** The server issues a security code to each client upon connection. This code must be included in subsequent requests, preventing unauthorized actions.
 - **No Data Persistence:** The server does not store any user data or conversation history. All messages are transient and deleted once all participants leave the chatroom, ensuring user privacy.
 
-![Security Architecture](screenshots/security_architecture.png)
+![Security Architecture](https://github.com/Nazar050802/Simple-Chat-with-GUI/blob/main/documentation/pictures/RSA.png)
 
 ## Testing
 
