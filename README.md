@@ -24,7 +24,7 @@
 
 **Simple Chat with GUI** is a user-friendly chat application designed to facilitate real-time communication between users in a secure, chatroom-like environment. Built with a graphical user interface (GUI) using Windows Presentation Foundation (WPF), the application comprises both server-side and client-side components, enabling seamless interaction and message exchange.
 
-![Chat Application Screenshot](screenshots/chat_screenshot.png)
+![Chat Application Screenshot](https://github.com/Nazar050802/Simple-Chat-with-GUI/blob/main/documentation/pictures/chat_screenshot.png)
 
 ## Features
 
@@ -115,7 +115,7 @@ Security is a paramount concern in the design of the Simple Chat application. He
 - **Secure Code Verification:** The server issues a security code to each client upon connection. This code must be included in subsequent requests, preventing unauthorized actions.
 - **No Data Persistence:** The server does not store any user data or conversation history. All messages are transient and deleted once all participants leave the chatroom, ensuring user privacy.
 
-![Security Architecture](https://github.com/Nazar050802/Simple-Chat-with-GUI/blob/main/documentation/pictures/RSA.png)
+![Security Architecture](https://github.com/Nazar050802/Simple-Chat-with-GUI/blob/main/documentation/pictures/RSA.jpg)
 
 ## Testing
 
