@@ -1,9 +1,6 @@
 # Simple Chat with GUI
 
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
-![GitHub issues](https://img.shields.io/github/issues/Nazar050802/Simple-Chat-with-GUI)
-![GitHub forks](https://img.shields.io/github/forks/Nazar050802/Simple-Chat-with-GUI)
-![GitHub stars](https://img.shields.io/github/stars/Nazar050802/Simple-Chat-with-GUI)
 
 ## Table of Contents
 - [Overview](#overview)
